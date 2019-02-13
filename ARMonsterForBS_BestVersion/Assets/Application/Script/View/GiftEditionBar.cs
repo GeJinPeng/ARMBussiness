@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class GiftEditionBar : ViewBasic {
+    public BusinessCouponView businessCouponView;
+
+
+    public BussinessRewardStruct bussinessRewardStruct;
 
     public Image rawardPor;
     public InputField rewardName;
@@ -13,7 +18,6 @@ public class GiftEditionBar : ViewBasic {
     public InputField dropPoolMaxCountInput;
 
     public Slider rewardDropRateSlider;
-
 
     public List<SonCoupon> composeRewads;//由其他构成的奖励
     private List<GameObject> rewardChildItems;
@@ -29,27 +33,78 @@ public class GiftEditionBar : ViewBasic {
     public Transform point1;
 
     private string imgData;
+
+    public void Init(BussinessRewardStruct info=null)
+    {
+        bussinessRewardStruct = info;
+        if (bussinessRewardStruct == null)
+        {
+            rewardName.text="";
+            rewardDescription.text="";
+            rewardDropRateSlider.value = 0;
+            dropCountInput.text = "0";
+            dropPoolMaxCountInput.text = "0";
+            needAnotherRewardcompose.isOn = false;
+            ClickOpenAnotherRewardComposeBar(false);
+        }
+        else {
+            rewardName.text = bussinessRewardStruct.title;
+            rewardDescription.text = bussinessRewardStruct.description;
+            rewardDropRateSlider.value = bussinessRewardStruct.rewardDropRate/100f;
+            dropCountInput.text = bussinessRewardStruct.rewardDropCount.ToString();
+            dropPoolMaxCountInput.text = bussinessRewardStruct.totalCount.ToString();
+
+            if (bussinessRewardStruct.rewardcomposeID != null && bussinessRewardStruct.rewardcomposeID.Count > 0)
+            {
+                needAnotherRewardcompose.isOn = true;
+                ClickOpenAnotherRewardComposeBar(true);
+                if (rewardChildItems == null)
+                    return;
+                foreach (var m in rewardChildItems)
+                {
+                    var item = m.GetComponent<GiftItem_ComposeInfo>();
+                    var data = bussinessRewardStruct.rewardcomposeID.FirstOrDefault(o => o.businesscouponIndex == item.sonCoupon.businessCouponIndex);
+                    if (data != null)
+                    {
+                        item.inpuCount.text = data.rewardDropCount.ToString();
+                        item.selectToggle.isOn = true;
+                    }
+                }
+            }
+
+
+        }
+    }
+
     public override void StartView()
     {
         base.StartView();
         gameObject.SetActive(true);
         FadeIn();
     }
-
     public void OnDisable()
     {
-        if(composeRewads!=null)
+        bussinessRewardStruct = null;
+        rewardName.text = "";
+        rewardDescription.text = "";
+        rewardDropRateSlider.value = 0;
+        dropCountInput.text = "0";
+        dropPoolMaxCountInput.text = "0";
+        ClickOpenAnotherRewardComposeBar(false);
+        needAnotherRewardcompose.isOn = false;
+        if (composeRewads != null)
         {
             composeRewads.Clear();
         }
 
-        if(rewardChildItems!=null)
+        if (rewardChildItems != null)
         {
-            int count = composeRewads.Count;
-            for(int i = 0 ; i < count;  i++)
+            int count = rewardChildItems.Count;
+            for (int i = 0; i < count; i++)
             {
                 Destroy(rewardChildItems[i]);
             }
+            rewardChildItems.Clear();
         }
     }
 
@@ -74,8 +129,9 @@ public class GiftEditionBar : ViewBasic {
         }
         else
         {
-           
             editorAnotherRewardComposeBar.gameObject.SetActive(false);
+
+
           //  editorDropRateComposeBar.transform.position = point1.transform.position; 
         }
     }
@@ -85,13 +141,16 @@ public class GiftEditionBar : ViewBasic {
         int count = _datas.Count;
         for(int i = 0 ; i < count; i++)
         {
-            if(rewardChildItems == null) rewardChildItems = new List<GameObject>();
-             GameObject item = Instantiate(composeItem);
-            item.transform.parent = composeRewardGrid;
-            item.transform.localScale = Vector3.one;
-            item.transform.localPosition = Vector3.zero;
-            item.GetComponent<GiftItem_ComposeInfo>().SetInfo(this, _datas[i]);
-            rewardChildItems.Add(item);
+            if (_datas[i].status == 0)
+            {
+                if (rewardChildItems == null) rewardChildItems = new List<GameObject>();
+                GameObject item = Instantiate(composeItem);
+                item.transform.parent = composeRewardGrid;
+                item.transform.localScale = Vector3.one;
+                item.transform.localPosition = Vector3.zero;
+                item.GetComponent<GiftItem_ComposeInfo>().SetInfo(this, _datas[i]);
+                rewardChildItems.Add(item);
+            }
         }
     }
 
@@ -147,11 +206,11 @@ public class GiftEditionBar : ViewBasic {
             AndaUIManager.Instance.PlayTips("奖励描述不能为空");
             return;
         }
-        if(imgData == null)
-        {
-            AndaUIManager.Instance.PlayTips("奖励图标不能为空");
-            return;
-        }
+        //if(imgData == null)
+        //{
+        //    AndaUIManager.Instance.PlayTips("奖励图标不能为空");
+        //    return;
+        //}
         if(dropPoolMaxCountInput.text == "")
         {
             AndaUIManager.Instance.PlayTips("请输入该奖励在奖励池中的最大数量");
@@ -170,20 +229,38 @@ public class GiftEditionBar : ViewBasic {
             return;
         }
 
-        BussinessRewardStruct bussinessRewardStruct = new BussinessRewardStruct();
-        bussinessRewardStruct.image = imgData;
-        bussinessRewardStruct.title = rewardName.text;
-        bussinessRewardStruct.description = rewardDescription.text; 
-        bussinessRewardStruct.rewardDropRate = (int)(rewardDropRateSlider.value*100); 
-        bussinessRewardStruct.rewardDropCount = int.Parse(dropCountInput.text);
-        List<SonCoupon> tmpSonCounpon =null;
-        if(needAnotherRewardcompose.isOn)
+        if (bussinessRewardStruct == null)
         {
-            tmpSonCounpon = composeRewads;
-        }
-       //bussinessRewardStruct.maxCount = int.Parse(dropPoolMaxCount.text);
+            bussinessRewardStruct = new BussinessRewardStruct();
+            bussinessRewardStruct.image = imgData;
+            bussinessRewardStruct.title = rewardName.text;
+            bussinessRewardStruct.description = rewardDescription.text;
+            bussinessRewardStruct.rewardDropRate = (int)(rewardDropRateSlider.value * 100);
+            bussinessRewardStruct.rewardDropCount = int.Parse(dropCountInput.text);
+            bussinessRewardStruct.totalCount = maxCount;
+            List<SonCoupon> tmpSonCounpon = null;
+            if (needAnotherRewardcompose.isOn)
+            {
+                tmpSonCounpon = composeRewads;
+            }
 
-        AndaDataManager.Instance.networkController.CallServerUploadReward(bussinessRewardStruct, tmpSonCounpon   , CallBackUplaod);
+            AndaDataManager.Instance.networkController.CallServerUploadReward(bussinessRewardStruct, tmpSonCounpon, CallBackUplaod);
+        }
+        else//编辑 
+        {
+            bussinessRewardStruct.image = imgData;
+            bussinessRewardStruct.title = rewardName.text;
+            bussinessRewardStruct.description = rewardDescription.text;
+            bussinessRewardStruct.rewardDropRate = (int)(rewardDropRateSlider.value * 100);
+            bussinessRewardStruct.rewardDropCount = int.Parse(dropCountInput.text);
+            bussinessRewardStruct.totalCount = maxCount;
+            List<SonCoupon> tmpSonCounpon = null;
+            if (needAnotherRewardcompose.isOn)
+            {
+                tmpSonCounpon = composeRewads;
+            }
+            AndaDataManager.Instance.networkController.CallServerEditReward(bussinessRewardStruct, tmpSonCounpon, CallBackEdit);
+        }
 
     }
 
@@ -191,13 +268,26 @@ public class GiftEditionBar : ViewBasic {
     {
         gameObject.SetActive(false);
     }
-
-
-    private void CallBackUplaod(bool issuccess)
+    private void CallBackEdit(BusinessCouponRequest _coupon)
     {
-        if(issuccess)
+        if (_coupon.code == "200")
         {
             AndaUIManager.Instance.PlayTips("Upload Success!");
+            businessCouponView.RefreshEditContentPanel(_coupon.data);
+            gameObject.SetActive(false);
+        }
+        else
+        {
+            AndaUIManager.Instance.PlayTips("Upload Faild");
+        }
+    }
+
+    private void CallBackUplaod(BusinessCouponRequest _coupon)
+    {
+        if(_coupon.code=="200")
+        {
+            AndaUIManager.Instance.PlayTips("Upload Success!");
+            businessCouponView.RefreshAddContentPanel(_coupon.data);
             gameObject.SetActive(false);
         }else
         {

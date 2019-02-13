@@ -9,6 +9,8 @@ public class LeftPanelView : MonoBehaviour {
 
     public PlayerCouponView playerCouponView;
 
+    public BusinessCouponView businessCouponView;
+
     public StrongholdInfoBar strongholdInfoBar;
 
     public ServerMessageView serverMessageView;
@@ -32,6 +34,13 @@ public class LeftPanelView : MonoBehaviour {
         Close();
         editorAccountView.StartView();
     }
+
+    public void ShowBusinessCouponView()
+    {
+        Close();
+        businessCouponView.ShowMain();
+    }
+
 
     public void ShowPlayerCouponView()
     {

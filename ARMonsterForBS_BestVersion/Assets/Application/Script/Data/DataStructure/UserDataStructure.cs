@@ -58,7 +58,7 @@ public class BussinessRewardStruct
     public int businesscouponIndex { get; set; }
     //商家Index
     public int userIndex { get; set; }
-    //所属据点Index
+    //所属据点Index 注意已弃用
     public int strongholdIndex { get; set; }
     //二维码预留字段
     public string code { get; set; }

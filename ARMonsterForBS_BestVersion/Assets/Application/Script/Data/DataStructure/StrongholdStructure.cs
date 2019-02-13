@@ -131,6 +131,7 @@ public class PlayerStrongHoldGrowUpAttribute: StrongholdGrowUpAttribute
 public class BusinessStrongholdGrowUpAttribute : StrongholdGrowUpAttribute
 { 
     public BusinessData BusinessData{get;set;}
+    public List<BusinessActivity> businessActivity { get; set; }
     public List<BussinessRewardStruct> businessCoupons { get; set; }
 }
 
