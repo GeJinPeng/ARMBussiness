@@ -195,7 +195,7 @@ public class MallView : MonoBehaviour  {
         if(Input.GetMouseButtonUp(0))
         {
             //float delta = Mathf.Abs(i)
-            if(Input.mousePosition.x - startMousePose.x > 300)
+            if(Input.mousePosition.x - startMousePose.x > 500)
             {
                 AndaUIManager.Instance.uIController.OpenLeftPanel();
                 Destroy(gameObject);
