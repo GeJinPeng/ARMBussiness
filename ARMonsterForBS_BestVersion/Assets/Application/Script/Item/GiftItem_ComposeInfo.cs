@@ -10,7 +10,7 @@ public class GiftItem_ComposeInfo : MonoBehaviour {
 
     public GiftEditionBar giftEditionBar;
 
-    private SonCoupon sonCoupon = new SonCoupon();
+    public SonCoupon sonCoupon = new SonCoupon();
 
     public Toggle selectToggle;
     public InputField inpuCount; 
@@ -29,7 +29,8 @@ public class GiftItem_ComposeInfo : MonoBehaviour {
 
     public void SetRewardIcon(Sprite sprite)
     {
-        rewardIcon.sprite =sprite;
+        if (rewardIcon != null)
+            rewardIcon.sprite = sprite;
     }
 
     public void SelectItem( )

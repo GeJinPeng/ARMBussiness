@@ -93,6 +93,7 @@ public class PlayerCouponView : MonoBehaviour {
     }
     public void ChangeType(int type)
     {
+
         if (ItemList == null)
             return;
         foreach (var m in ItemList)

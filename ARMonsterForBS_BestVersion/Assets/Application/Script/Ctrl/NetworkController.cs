@@ -248,14 +248,15 @@ public class NetworkController : MonoBehaviour {
 
 
     #region 上传编辑的奖励
-    public void CallServerUploadReward(BussinessRewardStruct data ,List<SonCoupon> sonCoupons, System.Action<bool> callback)
+    public void CallServerUploadReward(BussinessRewardStruct data, List<SonCoupon> sonCoupons, System.Action<BusinessCouponRequest> callback)
     {
 
         var _wForm = new WWWForm();
         _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
 
         _wForm.AddField("code", "");
-        _wForm.AddField("image", data.image);
+        if (data.image != null)
+            _wForm.AddField("image", data.image);
         _wForm.AddField("title", data.title);
         _wForm.AddField("description", data.description);
         _wForm.AddField("status", data.status);
@@ -264,21 +265,25 @@ public class NetworkController : MonoBehaviour {
         _wForm.AddField("continueTime", data.continueTime);
         _wForm.AddField("porIsUpdate", data.porIsUpdate);
         _wForm.AddField("createTime", data.createTime);
-        _wForm.AddField("rewardDropRate", data.rewardDropRate);
-        _wForm.AddField("rewardDropCount", data.rewardDropCount);
+        _wForm.AddField("DropRate", data.rewardDropRate);
+        _wForm.AddField("DropCount", data.rewardDropCount);
+        _wForm.AddField("totalCount", data.totalCount);
+        _wForm.AddField("type", data.type);
         string json = "";
         List<SonCoupon> sonCouponList = sonCoupons;
-        if(sonCoupons != null)
+        if (sonCoupons != null)
         {
             json = JsonMapper.ToJson(sonCouponList);
         }
         _wForm.AddField("SonCoupon", json);
-       
+
+
+        //string path = "http://localhost:57789/api/BusinessCoupon/Add";
         string path = networkAdress2 + "BusinessCoupon/Add";
-         StartCoroutine(ExcuteCallServerUploadReward(path, _wForm, callback));
+        StartCoroutine(ExcuteCallServerUploadReward(path, _wForm, callback));
     }
 
-    private IEnumerator ExcuteCallServerUploadReward(string _url, WWWForm _wForm, System.Action<bool> callback)
+    private IEnumerator ExcuteCallServerUploadReward(string _url, WWWForm _wForm, System.Action<BusinessCouponRequest> callback)
     {
         AndaUIManager.Instance.OpenWaitBoard(true);
         WWW postData = new WWW(_url, _wForm);
@@ -293,9 +298,122 @@ public class NetworkController : MonoBehaviour {
         {
             BusinessCouponRequest result = JsonMapper.ToObject<BusinessCouponRequest>(postData.text);
             AndaDataManager.Instance.mainData.AddBussinessRewar(result.data);
-            callback(result.code == "200");
+            callback(result);
         }
 
+    }
+
+
+    public void CallServerEditReward(BussinessRewardStruct data, List<SonCoupon> sonCoupons, System.Action<BusinessCouponRequest> callback)
+    {
+
+        var _wForm = new WWWForm();
+        _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
+        _wForm.AddField("couponIndex", data.businesscouponIndex);
+        _wForm.AddField("code", "");
+        if (data.image != null)
+            _wForm.AddField("image", data.image);
+        _wForm.AddField("title", data.title);
+        _wForm.AddField("description", data.description);
+        _wForm.AddField("status", data.status);
+        _wForm.AddField("starttime", data.starttime);
+        _wForm.AddField("endtime", data.endtime);
+        _wForm.AddField("continueTime", data.continueTime);
+        _wForm.AddField("porIsUpdate", data.porIsUpdate);
+        _wForm.AddField("createTime", data.createTime);
+        _wForm.AddField("DropRate", data.rewardDropRate);
+        _wForm.AddField("DropCount", data.rewardDropCount);
+        _wForm.AddField("totalCount", data.totalCount);
+        _wForm.AddField("type", data.type);
+        string json = "";
+        List<SonCoupon> sonCouponList = sonCoupons;
+        if (sonCoupons != null)
+        {
+            json = JsonMapper.ToJson(sonCouponList);
+        }
+        _wForm.AddField("SonCoupon", json);
+        //string path = "http://localhost:57789/api/BusinessCoupon/Edit";
+        string path = networkAdress2 + "BusinessCoupon/Edit";
+        StartCoroutine(ExcuteCallServerEditReward(path, _wForm, callback));
+    }
+
+    private IEnumerator ExcuteCallServerEditReward(string _url, WWWForm _wForm, System.Action<BusinessCouponRequest> callback)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(_url, _wForm);
+        yield return postData;
+        Debug.Log("PostData" + postData.text);
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (postData.error != null)
+        {
+            Debug.Log(postData.error);
+        }
+        else
+        {
+            BusinessCouponRequest result = JsonMapper.ToObject<BusinessCouponRequest>(postData.text);
+            callback(result);
+        }
+
+    }
+
+
+
+    public void CallServerUpperShelf(int index, System.Action<BusinessCouponRequest> callback)
+    {
+
+        var _wForm = new WWWForm();
+        _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
+        _wForm.AddField("couponIndex", index);
+        //string path = "http://localhost:57789/api/BusinessCoupon/UpperShelf";
+        string path = networkAdress2 + "BusinessCoupon/UpperShelf";
+        StartCoroutine(ExcuteCallServerUpperShelf(path, _wForm, callback));
+    }
+
+    private IEnumerator ExcuteCallServerUpperShelf(string _url, WWWForm _wForm, System.Action<BusinessCouponRequest> callback)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(_url, _wForm);
+        yield return postData;
+        Debug.Log("PostData" + postData.text);
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (postData.error != null)
+        {
+            Debug.Log(postData.error);
+        }
+        else
+        {
+            BusinessCouponRequest result = JsonMapper.ToObject<BusinessCouponRequest>(postData.text);
+            callback(result);
+        }
+    }
+
+    public void CallServerCancel(int index, System.Action<BusinessCouponRequest> callback)
+    {
+
+        var _wForm = new WWWForm();
+        _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
+        _wForm.AddField("couponIndex", index);
+        //string path = "http://localhost:57789/api/BusinessCoupon/Cancel";
+        string path = networkAdress2 + "BusinessCoupon/Cancel";
+        StartCoroutine(ExcuteCallServerCancel(path, _wForm, callback));
+    }
+
+    private IEnumerator ExcuteCallServerCancel(string _url, WWWForm _wForm, System.Action<BusinessCouponRequest> callback)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(_url, _wForm);
+        yield return postData;
+        Debug.Log("PostData" + postData.text);
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (postData.error != null)
+        {
+            Debug.Log(postData.error);
+        }
+        else
+        {
+            BusinessCouponRequest result = JsonMapper.ToObject<BusinessCouponRequest>(postData.text);
+            callback(result);
+        }
     }
     #endregion
 
@@ -525,6 +643,7 @@ public class NetworkController : MonoBehaviour {
     public void QRCheackCoupon(string QR, System.Action<PlayerCouponRequest> callback)
     {
         var _wForm = new WWWForm();
+        if (AndaDataManager.Instance.mainData == null) { callback(null); return; }
         _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
         _wForm.AddField("QR", QR);
 

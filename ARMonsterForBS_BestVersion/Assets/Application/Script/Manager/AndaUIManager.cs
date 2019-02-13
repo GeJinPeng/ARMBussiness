@@ -19,6 +19,9 @@ public class AndaUIManager {
 
     public UIController uIController;
 
+    public TipsTool tipsTool;
+
+    public ChoseTip choseTip;
 
     public void OpenWaitBoard(bool state)
     {
@@ -27,7 +30,13 @@ public class AndaUIManager {
 
     public void PlayTips(string tipsCountent)
     {
+        tipsTool.SetInfo(tipsCountent, 4f);
         Debug.Log("Tips:" + tipsCountent);
+    }
+
+    public void PlayChoseTips(string tipsCountent , System.Action callback)
+    {
+        choseTip.SetInfo(tipsCountent, callback);
     }
 
     public void OpenPhotopickBar(Button btn,System.Action<Texture2D> callback)

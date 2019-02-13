@@ -42,22 +42,33 @@ public class ScanningTool: MonoBehaviour
 
     public void Scanning()
     {
-        StartCoroutine("ScanningCoroutine");
-    }
-    public void StopScanning(PlayerCouponRequest info)
-    {
-        txt.text = info.code+""+ info.detail;
-        if (info.code == "200")
+        if (!IsScanning)
         {
-            txt.text = "扫描成功";
+            StartCoroutine("ScanningCoroutine");
+        }
+        else {
             IsScanning = false;
             cameraTexture.gameObject.SetActive(false);
         }
-        else
+    }
+    public void StopScanning(PlayerCouponRequest info)
+    {
+        webCameraTexture.Stop();
+        IsScanning = false;
+        cameraTexture.gameObject.SetActive(false);
+
+        if (info != null)
         {
-            IsScanning = true;
-            Debug.Log(info.detail);
-            txt.text = info.detail;
+            if (info.code == "200")
+            {
+                AndaUIManager.Instance.PlayTips("扫描成功");
+                txt.text = "扫描成功";
+            }
+            else
+            {
+                AndaUIManager.Instance.PlayTips("扫描失败");
+                txt.text = info.detail;
+            }
         }
     }
     void ScreenChange()//屏幕横竖屏切换
@@ -111,7 +122,6 @@ public class ScanningTool: MonoBehaviour
             Debug.Log(br.Text);
             if (br.Text != txt.text)
             {
-                txt.text = br.Text;
                 IsScanning = false;
                 AndaDataManager.Instance.QRCheackCoupon(br.Text, StopScanning);
             }
