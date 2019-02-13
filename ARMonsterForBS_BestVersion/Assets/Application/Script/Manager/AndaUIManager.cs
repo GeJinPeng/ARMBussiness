@@ -34,4 +34,13 @@ public class AndaUIManager {
     {
         uIController.OpenImageBar(btn, callback);
     }
+
+    public void SetIntoCanvas(Transform t)
+    {
+        t.parent = uIController.canvas;
+        t.localScale = Vector3.one;
+        t.localPosition = Vector3.zero;
+
+
+    }
 }

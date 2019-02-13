@@ -10,6 +10,7 @@ public class UIController : MonoBehaviour {
     public WaitBoard waitBoard;
     public OpenImage openImageBar;
 
+    public Transform canvas;
     private void Awake()
     {
         AndaUIManager.Instance.uIController = this;
