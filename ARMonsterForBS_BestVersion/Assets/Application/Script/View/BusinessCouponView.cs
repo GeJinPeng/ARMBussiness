@@ -124,6 +124,9 @@ public class BusinessCouponView : MonoBehaviour {
             }
         }
     }
+
+    
+
     public void Cheack()
     {
         AndaPlayerCouponManager.Instance.Cheack();

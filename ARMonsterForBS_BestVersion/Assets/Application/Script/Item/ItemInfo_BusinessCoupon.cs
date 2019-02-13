@@ -65,7 +65,13 @@ public class ItemInfo_BusinessCoupon : MonoBehaviour, IPointerClickHandler
     public void UpperShelfNetBack(BusinessCouponRequest info)
     {
         if (info.code == "200")
+        {
+            statusText.text = "状态:上架";
+            Bg.sprite = CouponView.sprite1;
+            UpperShelf.SetActive(false);
+            LowerShelf.SetActive(true);
             AndaUIManager.Instance.PlayTips("优惠卷已上架！");
+        }
         else
             AndaUIManager.Instance.PlayTips("失败！");
     }
@@ -81,7 +87,12 @@ public class ItemInfo_BusinessCoupon : MonoBehaviour, IPointerClickHandler
     public void CancelNetBack(BusinessCouponRequest info)
     {
         if (info.code == "200")
+        {
+            statusText.text = "状态:作废";
+            Bg.sprite = CouponView.sprite3;
+            UpperShelf.SetActive(false);
             AndaUIManager.Instance.PlayTips("优惠卷已作废！");
+        }
         else
             AndaUIManager.Instance.PlayTips("失败！");
     }
