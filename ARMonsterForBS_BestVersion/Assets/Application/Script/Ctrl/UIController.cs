@@ -10,6 +10,8 @@ public class UIController : MonoBehaviour {
     public WaitBoard waitBoard;
     public OpenImage openImageBar;
 
+    public LeftPanelView leftPanelView;
+
     private void Awake()
     {
         AndaUIManager.Instance.uIController = this;
@@ -30,6 +32,11 @@ public class UIController : MonoBehaviour {
         openImageBar.transform.SetAsLastSibling();
         openImageBar.RegisterCallback(callback);
         openImageBar.OpenPonePhoto(btn);
+    }
+
+    public void OpenLeftPanel()
+    {
+        leftPanelView.Show();
     }
 
 }
