@@ -182,5 +182,25 @@ public class MallView : MonoBehaviour  {
         BuildItem();
     }
 
+    private Vector3 startMousePose;
+
+
+    private void Update()
+    {
+        if(Input.GetMouseButtonDown(0))
+        {
+            startMousePose = Input.mousePosition;
+        }
+
+        if(Input.GetMouseButtonUp(0))
+        {
+            //float delta = Mathf.Abs(i)
+            if(Input.mousePosition.x - startMousePose.x > 300)
+            {
+                AndaUIManager.Instance.uIController.OpenLeftPanel();
+                Destroy(gameObject);
+            }
+        }
+    }
 
 }

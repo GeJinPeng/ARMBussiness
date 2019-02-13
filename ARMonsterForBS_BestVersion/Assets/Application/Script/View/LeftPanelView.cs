@@ -59,6 +59,15 @@ public class LeftPanelView : MonoBehaviour {
         Close();
         serverMessageView.ShowMain();
     }
+
+    public void OpenMall()
+    {
+        Close();
+        GameObject mall= Resources.Load<GameObject>("Prefab/MallBar");
+        mall = Instantiate(mall);
+        AndaUIManager.Instance.SetIntoCanvas(mall.transform);
+    }
+
     // Use this for initialization
     void Start () {
 		

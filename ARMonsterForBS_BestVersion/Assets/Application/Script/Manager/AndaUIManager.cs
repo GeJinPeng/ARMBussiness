@@ -46,7 +46,7 @@ public class AndaUIManager {
 
     public void SetIntoCanvas(Transform t)
     {
-        t.parent = uIController.canvas;
+        t.parent = uIController.transform;
         t.localScale = Vector3.one;
         t.localPosition = Vector3.zero;
 
