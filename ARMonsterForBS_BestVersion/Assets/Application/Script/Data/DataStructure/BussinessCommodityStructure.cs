@@ -22,7 +22,7 @@ public class MallCommodityStructure
     /// <value>The commodity identifier.</value>
     public string commodityID {get;set;}
     /// <summary>
-    /// Gets or sets the name of the commodity.
+    /// 像有些 套餐 或者 福袋，他们由多个物品组成，名字就需要另外取，。这个值为空的情况下，一定是单品，否则会报错
     /// </summary>
     /// <value>The name of the commodity.</value>
     public string commodityName{get;set;}

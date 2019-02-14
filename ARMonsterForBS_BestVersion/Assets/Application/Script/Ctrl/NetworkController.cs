@@ -728,4 +728,38 @@ public class NetworkController : MonoBehaviour {
         }
     }
     #endregion
+
+
+    #region 购买验证
+
+    public void VerifyAppleBuy(string appleReceipt)
+    {
+        var _wForm = new WWWForm();
+        if (AndaDataManager.Instance.mainData == null)
+            return;
+        _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
+        _wForm.AddField("appleReceipt", appleReceipt);
+        string path = networkAdress2 + "Mall/IosBuy";
+        //string path = "http://localhost:57789/api/ServerMessage/Get";
+        StartCoroutine(ExcuteVerifyAppleBuy(path, _wForm));
+    }
+
+    private IEnumerator ExcuteVerifyAppleBuy(string _url, WWWForm _wForm)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(_url, _wForm);
+        yield return postData;
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (postData.error != null)
+        {
+            Debug.Log(postData.error);
+        }
+        else
+        {
+            Result result = JsonMapper.ToObject< Result >(postData.text);
+            Debug.Log("AndaSaid: "  + result.detail );
+        }
+    }
+
+    #endregion
 }

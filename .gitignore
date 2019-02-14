@@ -4,6 +4,8 @@
 [Bb]uild/
 [Bb]uilds/
 [Pp]rojectSettings
+[Aa]MB_Ios
+iosTarget
 Assets/AssetStoreTools*
 
 # Visual Studio cache directory

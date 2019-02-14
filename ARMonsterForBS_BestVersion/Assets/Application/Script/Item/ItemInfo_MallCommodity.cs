@@ -89,10 +89,10 @@ public class ItemInfo_MallCommodity : MonoBehaviour {
 
     public void ClickPay()
     {
+       // AndaDataManager.Instance.networkController.VerifyAppleBuy("json");
 
+        AndaDataManager.Instance.mainContoller.Purchase("commodityID" + mallCommodityStructure.commodityIndex);
     }
-
-
 
 }
 

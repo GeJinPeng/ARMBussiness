@@ -35,7 +35,7 @@ public static class GetGameConfigData  {
                             commodityID = "sh_bs_00",
                             count = 3,
                             endTime = 0,
-                            description = "获得6张萌新据点建造图纸，可以立即使用建造一个萌新据点",
+                            description = "获得3张萌新据点建造图纸，可以立即使用建造一个萌新据点",
                             state = 0,
                             priceType = new List<int>{0,0,0,1},
                             price = new List<int>{0,0,0,3},
@@ -60,7 +60,7 @@ public static class GetGameConfigData  {
                             description = "获得20张萌新据点建造图纸，可以立即使用建造一个萌新据点",
                             state = 0,
                             priceType = new List<int>{0,0,0,1},
-                            price = new List<int>{0,0,0,14},
+                            price = new List<int>{0,0,0,18},
                         },
                         //初级
                         new MallCommodityStructure
@@ -140,12 +140,12 @@ public static class GetGameConfigData  {
                         {
                             commodityIndex = 10,
                             commodityID = "sh_bs_04",
-                            count = 1,
+                            count = 3,
                             endTime = 0,
-                            description = "获得1张璀璨据点建造图纸，可以立即使用建造一个璀璨据点",
+                            description = "获得3张璀璨据点建造图纸，可以立即使用建造一个璀璨据点",
                             state = 0,
                             priceType = new List<int>{0,0,0,1},
-                            price = new List<int>{0,0,0,30},
+                            price = new List<int>{0,0,0,88},
                         },
 
                          new MallCommodityStructure
@@ -237,7 +237,7 @@ public static class GetGameConfigData  {
                             description = "获得一张高级 氐宿 星宿卡，适用于中级及以上所有据点",
                             state = 0,
                             priceType = new List<int>{0,0,0,1},
-                            price = new List<int>{0,0,0,3},
+                            price = new List<int>{0,0,0,6},
                         },
 
                          new MallCommodityStructure
@@ -249,7 +249,7 @@ public static class GetGameConfigData  {
                             description = "获得一张高级 尾宿 星宿卡，适用于中级及以上所有据点",
                             state = 0,
                             priceType = new List<int>{1,0,0,1},
-                            price = new List<int>{36000,0,0,3},
+                            price = new List<int>{36000,0,0,6},
                         },
 
                          new MallCommodityStructure
@@ -261,7 +261,7 @@ public static class GetGameConfigData  {
                             description = "获得一张高级 烛光 E星卡，适用于中级及以上所有据点",
                             state = 0,
                             priceType = new List<int>{0,0,0,1},
-                            price = new List<int>{0,0,0,3},
+                            price = new List<int>{0,0,0,6},
                         },
 
 
@@ -545,7 +545,7 @@ public static class GetGameConfigData  {
                         {
                             commodityIndex = 31,
                             commodityID = "sh_bs_lvup_all_04",
-                            commodityName = "财升万座_璀璨",
+                            commodityName = "财升万座_璀璨VIP",
                             count = 1,
                             endTime = 0,
                             description = "获得1张 璀璨据点提升卡 ,可以将名下所有的据点提升至璀璨 ，还有更加更加丰富的赠品哦！点击查看",
