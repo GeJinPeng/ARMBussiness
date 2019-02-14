@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
+using LitJson;
 public static class GetGameConfigData  {
 
 	
@@ -572,6 +572,10 @@ public static class GetGameConfigData  {
 
             }
 
+            string mallJson = JsonMapper.ToJson(_bssinessMall);
+            Debug.Log("AndaSaid:商城的商品配置文件表(会更新）Json=>>>>>>" + mallJson);
+
+
             return _bssinessMall;
         }
     }
@@ -748,6 +752,9 @@ public static class GetGameConfigData  {
                 };
             }
 
+            string mallJson = JsonMapper.ToJson(_commoditise);
+            Debug.Log("AndaSaid:游戏物件配置表(还会更新）：Json=>>>>>>" + mallJson);
+
             return _commoditise;
         }
     }
@@ -814,6 +821,10 @@ public static class GetGameConfigData  {
                     },
                 };
             }
+
+            string mallJson = JsonMapper.ToJson(_mallCommodityType);
+            Debug.Log("AndaSaid:商城界面用到的分类配置：Json=>>>>>>" + mallJson);
+
             return _mallCommodityType;
         }
     }
