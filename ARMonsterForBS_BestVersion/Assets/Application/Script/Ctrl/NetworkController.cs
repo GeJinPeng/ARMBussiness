@@ -288,7 +288,9 @@ public class NetworkController : MonoBehaviour {
         AndaUIManager.Instance.OpenWaitBoard(true);
         WWW postData = new WWW(_url, _wForm);
         yield return postData;
+        #if UNITY_EDITOR
         Debug.Log("PostData" + postData.text);
+        #endif
         AndaUIManager.Instance.OpenWaitBoard(false);
         if (postData.error != null)
         {
@@ -303,11 +305,13 @@ public class NetworkController : MonoBehaviour {
 
     }
 
+    #region 向服务器重新编辑奖励券
 
     public void CallServerEditReward(BussinessRewardStruct data, List<SonCoupon> sonCoupons, System.Action<BusinessCouponRequest> callback)
     {
 
         var _wForm = new WWWForm();
+        Debug.Log("dataCouponIndex:" +data.businesscouponIndex );
         _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
         _wForm.AddField("couponIndex", data.businesscouponIndex);
         _wForm.AddField("code", "");
@@ -351,14 +355,17 @@ public class NetworkController : MonoBehaviour {
         else
         {
             BusinessCouponRequest result = JsonMapper.ToObject<BusinessCouponRequest>(postData.text);
+            AndaDataManager.Instance.mainData.UpdateBussinessCouponState(result.data);
             callback(result);
         }
 
     }
+    #endregion
 
 
+    #region 向 服务起上传 票据
 
-    public void CallServerUpperShelf(int index, System.Action<BusinessCouponRequest> callback)
+    public void CallServerUpperShelf(int index, System.Action<int> callback)
     {
 
         var _wForm = new WWWForm();
@@ -366,28 +373,46 @@ public class NetworkController : MonoBehaviour {
         _wForm.AddField("couponIndex", index);
         //string path = "http://localhost:57789/api/BusinessCoupon/UpperShelf";
         string path = networkAdress2 + "BusinessCoupon/UpperShelf";
-        StartCoroutine(ExcuteCallServerUpperShelf(path, _wForm, callback));
+        StartCoroutine(ExcuteCallServerUpperShelf(index,path, _wForm, callback));
     }
 
-    private IEnumerator ExcuteCallServerUpperShelf(string _url, WWWForm _wForm, System.Action<BusinessCouponRequest> callback)
+    private IEnumerator ExcuteCallServerUpperShelf(int itemIndex,string _url, WWWForm _wForm, System.Action<int> callback)
     {
-        AndaUIManager.Instance.OpenWaitBoard(true);
+        AndaUIManager.Instance.OpenWaitBoard(true); 
         WWW postData = new WWW(_url, _wForm);
         yield return postData;
+        #if UNITY_EDITOR
         Debug.Log("PostData" + postData.text);
+        #endif
         AndaUIManager.Instance.OpenWaitBoard(false);
         if (postData.error != null)
         {
-            Debug.Log(postData.error);
+            AndaUIManager.Instance.PlayTipsForChoose("上架失败，请检查网络", 1, "好的", "", null, null);
+
         }
         else
         {
             BusinessCouponRequest result = JsonMapper.ToObject<BusinessCouponRequest>(postData.text);
-            callback(result);
+
+            if (result.code == "200")
+            {
+                AndaDataManager.Instance.mainData.UpdateBussinessCouponStateToUploadSell(itemIndex);
+
+                callback(itemIndex);
+            }else
+            {
+                AndaUIManager.Instance.PlayTipsForChoose("上架失败，请检查网络", 1, "好的", "", null, null);
+
+            }
+
+
         }
     }
 
-    public void CallServerCancel(int index, System.Action<BusinessCouponRequest> callback)
+    #endregion
+
+    #region 作废票据
+    public void CallServerCancel(int index, System.Action<int> callback)
     {
 
         var _wForm = new WWWForm();
@@ -395,10 +420,10 @@ public class NetworkController : MonoBehaviour {
         _wForm.AddField("couponIndex", index);
         //string path = "http://localhost:57789/api/BusinessCoupon/Cancel";
         string path = networkAdress2 + "BusinessCoupon/Cancel";
-        StartCoroutine(ExcuteCallServerCancel(path, _wForm, callback));
+        StartCoroutine(ExcuteCallServerCancel(index, path, _wForm, callback));
     }
 
-    private IEnumerator ExcuteCallServerCancel(string _url, WWWForm _wForm, System.Action<BusinessCouponRequest> callback)
+    private IEnumerator ExcuteCallServerCancel(int couponIndex, string _url, WWWForm _wForm, System.Action<int> callback)
     {
         AndaUIManager.Instance.OpenWaitBoard(true);
         WWW postData = new WWW(_url, _wForm);
@@ -408,13 +433,26 @@ public class NetworkController : MonoBehaviour {
         if (postData.error != null)
         {
             Debug.Log(postData.error);
+            AndaUIManager.Instance.PlayTipsForChoose("作废失败，请检查网络", 1, "好的", "", null, null);
+
         }
         else
         {
+
             BusinessCouponRequest result = JsonMapper.ToObject<BusinessCouponRequest>(postData.text);
-            callback(result);
+            if(result.code == "200")
+            {
+                AndaDataManager.Instance.mainData.UpdateBussinessCouponStateDownSell(couponIndex);
+                callback(couponIndex);
+            }
+            else
+            {
+                AndaUIManager.Instance.PlayTipsForChoose("作废失败，请检查网络", 1 ,"好的" , "", null ,null);
+            }
+           
         }
     }
+    #endregion
     #endregion
 
     #region 往商家据点里放入奖励
@@ -523,10 +561,10 @@ public class NetworkController : MonoBehaviour {
     public void CallServerGetImagePor(string address ,System.Action<Sprite> callback)
     {
         string st = networkAdress4 + address;
-        StartCoroutine(ExcuteCallServerGetImagePor(st,callback));
+        StartCoroutine(ExcuteCallServerGetImagePor(address,st, callback));
     }
 
-    private IEnumerator ExcuteCallServerGetImagePor(string adress,System.Action<Sprite> callback)
+    private IEnumerator ExcuteCallServerGetImagePor(string porAdrress,string adress,System.Action<Sprite> callback)
     {
         AndaUIManager.Instance.OpenWaitBoard(true);
         WWW wWW = new WWW(adress);
@@ -534,11 +572,14 @@ public class NetworkController : MonoBehaviour {
         AndaUIManager.Instance.OpenWaitBoard(false);
         if(string.IsNullOrEmpty(wWW.error))
         {
-            byte[] b = wWW.texture.EncodeToPNG();
-            string t = ConvertTool.bytesToString(b);
-            PlayerPrefs.SetString("SH_" + adress, t);
+            //byte[] b = wWW.texture.EncodeToPNG();
+         
             Texture2D texture2D = ConvertTool.ConvertToTexture2d(wWW.texture);
             Sprite sprite = ConvertTool.ConvertToSpriteWithTexture2d(texture2D);
+            byte[] b = texture2D.EncodeToPNG();
+            string t = ConvertTool.bytesToString(b);
+            PlayerPrefs.SetString("SH_" + porAdrress, t);
+           
             callback(sprite);
         }else
         {
@@ -554,10 +595,10 @@ public class NetworkController : MonoBehaviour {
     public void CallServerGetRewardImagePor(string address, System.Action<Sprite> callback)
     {
         string st = networkAdress4 + address;
-        StartCoroutine(ExcuteCallServerGetImagePor(st, callback));
+        StartCoroutine(ExcuteCallServerGetRewardImagePor(address,st, callback));
     }
 
-    private IEnumerator ExcuteCallServerGetRewardImagePor(string adress, System.Action<Sprite> callback)
+    private IEnumerator ExcuteCallServerGetRewardImagePor(string proPaht, string adress, System.Action<Sprite> callback)
     {
         AndaUIManager.Instance.OpenWaitBoard(true);
         WWW wWW = new WWW(adress);
@@ -567,7 +608,7 @@ public class NetworkController : MonoBehaviour {
         {
             byte[] b = wWW.texture.EncodeToPNG();
             string t = ConvertTool.bytesToString(b);
-            PlayerPrefs.SetString("RW_"+adress , t);
+            PlayerPrefs.SetString("RW_"+ proPaht, t);
             Texture2D texture2D = ConvertTool.ConvertToTexture2d(wWW.texture);
             Sprite sprite = ConvertTool.ConvertToSpriteWithTexture2d(texture2D);
             callback(sprite);
@@ -728,7 +769,6 @@ public class NetworkController : MonoBehaviour {
         }
     }
     #endregion
-
 
     #region 购买验证
 

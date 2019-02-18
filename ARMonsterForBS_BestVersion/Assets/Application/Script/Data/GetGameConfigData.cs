@@ -569,11 +569,12 @@ public static class GetGameConfigData  {
 
                     }
                 };
+                string mallJson = JsonMapper.ToJson(_bssinessMall);
+                Debug.Log("AndaSaid:商城的商品配置文件表(会更新）Json=>>>>>>" + mallJson);
 
             }
 
-            string mallJson = JsonMapper.ToJson(_bssinessMall);
-            Debug.Log("AndaSaid:商城的商品配置文件表(会更新）Json=>>>>>>" + mallJson);
+           
 
 
             return _bssinessMall;
@@ -750,10 +751,11 @@ public static class GetGameConfigData  {
                         },
                     }
                 };
+                string mallJson = JsonMapper.ToJson(_commoditise);
+                Debug.Log("AndaSaid:游戏物件配置表(还会更新）：Json=>>>>>>" + mallJson);
             }
 
-            string mallJson = JsonMapper.ToJson(_commoditise);
-            Debug.Log("AndaSaid:游戏物件配置表(还会更新）：Json=>>>>>>" + mallJson);
+
 
             return _commoditise;
         }
@@ -820,10 +822,11 @@ public static class GetGameConfigData  {
                         }
                     },
                 };
+                string mallJson = JsonMapper.ToJson(_mallCommodityType);
+                Debug.Log("AndaSaid:商城界面用到的分类配置：Json=>>>>>>" + mallJson);
             }
 
-            string mallJson = JsonMapper.ToJson(_mallCommodityType);
-            Debug.Log("AndaSaid:商城界面用到的分类配置：Json=>>>>>>" + mallJson);
+           
 
             return _mallCommodityType;
         }
@@ -831,6 +834,36 @@ public static class GetGameConfigData  {
 
     #endregion
 
+    #region 物品分类
+
+    private static List<CommodityTypeStructure> _commodityTypeStructure =null;
+    public static List<CommodityTypeStructure> commodityTypeStructure
+    {
+        get
+        {
+            if(_commodityTypeStructure == null)
+            {
+                _commodityTypeStructure = new List<CommodityTypeStructure>
+                {
+                    new CommodityTypeStructure
+                    { 
+                        typte = "rc",
+                        cnName = "优惠券",
+                        idList = new   List<string> 
+                        {
+                            "rc_bs_00",
+                            "rc_bs_01"
+                        }
+                    }
+                };
+              
+            }
+
+            return _commodityTypeStructure;
+        }
+
+    }
+    #endregion
 
     /// <summary>
     /// 通过id 查找物件配置表中的物件
@@ -859,4 +892,59 @@ public static class GetGameConfigData  {
     {
         return BussineMallData.data.FirstOrDefault(s => s.commodityID == id);
     }
+
+    public static List<CommodityStructure> SortRCFormCommodityConfig()
+    {
+        List<CommodityStructure> cs = new List<CommodityStructure>();
+        //获取配置文件里所有的票据编道具
+        int count = Commodities.data.Count;
+        List<string> ids = commodityTypeStructure.FirstOrDefault(s=>s.typte == "rc").idList;
+        int count2 = ids.Count;
+        for (int i = 0; i < count; i++)
+        {
+            for (int j = 0; j < count2; j++)
+            {
+                if(Commodities.data[i].commodityID == ids[j])
+                {
+                    cs.Add(Commodities.data[i]);
+                }
+            }
+        }
+
+        return cs;
+    }
+
+
+
+    //test // 假的数据
+
+    private static List<BusinessSD_Pag4U> _userPackages = null;
+    public static List<BusinessSD_Pag4U> userPackages
+    {
+        get
+        {
+            if(_userPackages == null)
+            {
+                _userPackages = new List<BusinessSD_Pag4U>
+                {
+                    new BusinessSD_Pag4U
+                    {
+                        hostIndex = AndaDataManager.Instance.mainData.playerData.userIndex,
+                        commodityID = "rc_bs_00",
+                        objectCount = 50,
+                        objectIndex = 1,
+                    }
+                };
+            }
+            return _userPackages;
+        }
+    }
+
+
+}
+
+public class UserPagekageData
+{
+    public string id{get;set;}
+    public int count {get;set;}
 }

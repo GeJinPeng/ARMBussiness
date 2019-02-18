@@ -62,11 +62,32 @@ public class MallCommodityStructure
     /// <value>The child.</value>
     public List<MallCommodityStructure> child {get;set;}
 }
+public class PayWay
+{
+    public int payType { get; set; }
+    public int payPrice { get; set; }
+}
+
+
+public class MallCommodityTypeStructure
+{
+    public string type { get; set; }
+    public string typeName { get; set; }
+    /// <summary>
+    /// 商店里物件的游标
+    /// </summary>
+    /// <value>The index of the item.</value>
+    public List<int> itemIndex { get; set; }
+}
+
+//注意 物品和商品的区别。
 
 public class Commoditiestructure
 {
     public List<CommodityStructure> data {get;set;}
 }
+
+
 
 public class CommodityStructure
 {
@@ -77,19 +98,11 @@ public class CommodityStructure
     public string description { get; set; }
 }
 
-public class MallCommodityTypeStructure
+public class CommodityTypeStructure
 {
-    public string type {get;set;}
-    public string typeName{get;set;}
-    /// <summary>
-    /// 商店里物件的游标
-    /// </summary>
-    /// <value>The index of the item.</value>
-    public List<int> itemIndex{get;set;}
+    public string typte{get;set;}
+    public string cnName{get;set;}
+    public List<string> idList{get;set;}
 }
 
-public class PayWay
-{
-    public int payType  {get;set;}
-    public int payPrice{ get;set;}
-}
+

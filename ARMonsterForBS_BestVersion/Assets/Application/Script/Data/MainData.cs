@@ -6,7 +6,7 @@ public class MainData  {
 
     public BusinessData playerData ;
     public string token;
-
+    public Sprite userImage;
     public List<BusinessStrongholdAttribute> businessStrongholdAttributes;
     public List<LD_Objs> strongholdDrawingList = new List<LD_Objs>();
     public List<LD_Objs> strongholdRewardCardList = new List<LD_Objs>();
@@ -20,6 +20,13 @@ public class MainData  {
         token =_token;
         playerData = _playerData;
         bussinessReward = playerData.businessCoupons;
+        int count = bussinessReward.Count;
+        for(int i = 0; i <count; i ++)
+        {
+            Debug.Log("CouponState" + bussinessReward[i].status);
+        }
+
+
         BuildBussinessStrongholdAttrubte();
         BuildStrongholdDawingList();
         GetImg();
@@ -146,6 +153,11 @@ public class MainData  {
         businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex).coupons.Remove(rewardIndex);
     }
 
+    public void AddBussinessCoupon(BussinessRewardStruct _brs)
+    {
+        playerData.businessCoupons.Add(_brs);
+    }
+
     public void UpdateStrongholdNickName(int shIndex , string nickName)
     {
         businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex).strongholdNickName = nickName;
@@ -154,6 +166,38 @@ public class MainData  {
             UpdateStrongholdDataEvent(businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex));
         }
     }
+
+    #region 更新票据
+    public void UpdateBussinessCouponState(BussinessRewardStruct _brs)
+    {
+        BussinessRewardStruct brs = 
+            playerData.businessCoupons.FirstOrDefault(
+                s=> s.businesscouponIndex == _brs.businesscouponIndex);
+        if(brs == null) return;
+        brs = _brs;
+    }
+
+    public void UpdateBussinessCouponStateToUploadSell(int brsIndex )
+    {
+        BussinessRewardStruct brs =
+            playerData.businessCoupons.FirstOrDefault(
+                s => s.businesscouponIndex == brsIndex);
+        if (brs == null) return;
+        brs.status = 0;
+    }
+    /// <summary>
+    /// 下架
+    /// </summary>
+    /// <param name="brsIndex">Brs index.</param>
+    public void UpdateBussinessCouponStateDownSell(int brsIndex)
+    {
+        BussinessRewardStruct brs =
+            playerData.businessCoupons.FirstOrDefault(
+                s => s.businesscouponIndex == brsIndex);
+        if (brs == null) return;
+        brs.status = 2;
+    }
+    #endregion
 
     #endregion
 }

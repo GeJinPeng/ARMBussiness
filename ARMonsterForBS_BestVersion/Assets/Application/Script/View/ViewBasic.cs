@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ViewBasic : MonoBehaviour {
+
+
+    public ViewBasic lastView;
+
     public BaseController baseController;
     public CanvasGroup canvasGroup;
     private float currentFadeProgress;
@@ -56,5 +60,18 @@ public class ViewBasic : MonoBehaviour {
         }
 
         gameObject.SetActive(false);
+    }
+    protected bool isMe = false;
+    public virtual void IsYou(bool _isMe)
+    {
+        isMe = _isMe;
+    }
+
+    public virtual void OutView()
+    {
+        if(lastView!=null)
+        {
+            lastView.IsYou(true);
+        }
     }
 }

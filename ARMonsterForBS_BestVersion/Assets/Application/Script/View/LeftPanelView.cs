@@ -38,7 +38,11 @@ public class LeftPanelView : MonoBehaviour {
     public void ShowBusinessCouponView()
     {
         Close();
-        businessCouponView.ShowMain();
+
+        GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.BusinessCouponManagerView);
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+
+      //  businessCouponView.ShowMain();
     }
 
 
@@ -68,6 +72,13 @@ public class LeftPanelView : MonoBehaviour {
         AndaUIManager.Instance.SetIntoCanvas(mall.transform);
     }
 
+    public void OpenAdditionEditorCouponView()
+    {
+        Close();
+        GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.AdditionEditorCouponView);
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+    }
+
     // Use this for initialization
     void Start () {
 		
@@ -77,4 +88,6 @@ public class LeftPanelView : MonoBehaviour {
 	void Update () {
 		
 	}
+
+
 }

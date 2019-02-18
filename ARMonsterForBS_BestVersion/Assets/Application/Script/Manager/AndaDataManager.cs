@@ -26,13 +26,30 @@ public class AndaDataManager  {
      
     public MainData mainData ;
 
-
+    //程序中一些固定的引用字符
+    public const string RCItem00 = "RCItem00";
+    public const string AdditionEditorCouponView = "AdditionEditorCoupon";
+    public const string ChooseTipsView = "ChooseTipsView";
+    public const string BussinessCouponItem = "BussinessCouponItem";
+    public const string BusinessCouponManagerView = "BusinessCouponManagerView";
     #region 设置和更新数据
     public void SetUserData(BusinessData playerData , string token)
     {
         if(mainData == null)mainData = new MainData();
         mainData.SetUserInformation(playerData, token);
     }
+    #endregion
+
+    #region 一些扩张方法
+
+    public void SetInto(Transform from , Transform to)
+    {
+        from.transform.parent  = to;
+        from.transform.localScale = Vector3.one;
+        from.transform.localPosition = Vector3.zero;
+        from.transform.localEulerAngles = Vector3.zero;
+    }
+
     #endregion
 
     #region 从Resources读取物件
@@ -47,10 +64,25 @@ public class AndaDataManager  {
         return Resources.Load<Sprite>("Sprite/Icon/" + id);
     }
 
+    public Sprite GetCommoditySprite(string id)
+    {
+        return Resources.Load<Sprite>("Sprite/Commodity/" + id);
+    }
+
     public GameObject GetItemInfoPrefab(string itemName)
     {
         return Resources.Load<GameObject>("Prefab/"+ itemName);
     }
+
+    public GameObject InstantiateItem(string id)
+    {
+        GameObject item = GetItemInfoPrefab(id);
+        item = GameObject.Instantiate(item);
+        item.transform.position = Vector3.zero;
+        item.transform.localScale = Vector3.one;
+        return item;
+    }
+
 
     #endregion
 
@@ -126,24 +158,58 @@ public class AndaDataManager  {
     public void GetUserImg(string path, System.Action<Sprite> action)
     {
         string s = PlayerPrefs.GetString("SH_" + path);
+       
         if (s == "")
         {
             CallServerGetUserImg(path, action);
+            Debug.Log("从网络读取");
         }
         else
         {
+            if(mainData.userImage!=null) 
+            {
+                action(mainData.userImage);
+                Debug.Log("复制");
+            }
+            else
+            {
+                Debug.Log("mm" + s);
+                byte[] vs = ConvertTool.StringToBytes(s);
+                Debug.Log("vs" +vs);
+                Texture2D texture = new Texture2D(128, 128);
 
-            byte[] vs = ConvertTool.StringToBytes(s);
-            Texture2D texture = new Texture2D(128, 128);
-            texture.LoadImage(vs);
-            texture = ConvertTool.ConvertToTexture2d(texture);
-            Sprite sprite = ConvertTool.ConvertToSpriteWithTexture2d(texture);
-            action(sprite);
+                texture.LoadImage(vs);
+                texture = ConvertTool.ConvertToTexture2d(texture);
+                Sprite sprite = ConvertTool.ConvertToSpriteWithTexture2d(texture);
+                if(mainData.userImage == null) mainData.userImage = sprite; 
+                action(sprite);
+                Debug.Log("从本地读取");
+            }
+
         }
     }
 
     #endregion
 
+    #region 插叙我的背包
+    /// <summary>
+    /// 查询某个Item剩余多少个
+    /// </summary>
+    public int CheckItemLessCount(string iD)
+    {
+        int count = mainData.playerData.businessSD_Pag4Us.Count;
+        for(int i = 0; i  < count;i++)
+        {
+            if(mainData.playerData.businessSD_Pag4Us[i].commodityID == iD)
+            {
+                return mainData.playerData.businessSD_Pag4Us[i].objectCount;
+            }
+        }
+
+        return 0;
+    }
+
+    #endregion
 
 
     #region 与服务器通信

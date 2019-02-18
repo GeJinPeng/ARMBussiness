@@ -34,6 +34,13 @@ public class AndaUIManager {
         Debug.Log("Tips:" + tipsCountent);
     }
 
+    public void PlayTipsForChoose(string content, int tipsType,string btn1Title, string btn2Title, System.Action comfrim ,System.Action cancel)
+    {
+        GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.ChooseTipsView);
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+        view.GetComponent<ChooseTips>().SetTips(content,tipsType,btn1Title,btn2Title,comfrim,cancel);
+    }
+
     public void PlayChoseTips(string tipsCountent , System.Action callback)
     {
         choseTip.SetInfo(tipsCountent, callback);
@@ -52,4 +59,6 @@ public class AndaUIManager {
 
 
     }
+
+
 }

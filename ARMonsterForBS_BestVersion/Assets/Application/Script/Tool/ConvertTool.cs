@@ -79,12 +79,15 @@ public static class ConvertTool  {
     /// <returns>Base64String</returns>
     public static string bytesToString(byte[] bts)
     {
-        return System.Convert.ToBase64String(bts);
+        return Convert.ToBase64String(bts);
     }
 
     public static byte[] StringToBytes(string str)
     {
-        return System.Text.Encoding.Default.GetBytes(str);
+        //return System.Text.Encoding.Default.GetBytes(str);
+       return Convert.FromBase64String(str);
+        //Base64 Decoded
+       // byte[] decoded = System.baseBase64.getDecoder().decode(encoded);
     }
 
 

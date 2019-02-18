@@ -46,11 +46,25 @@ public class PlayerData :UserBaseData
 //商家数据
 public class BusinessData : UserBaseData
 {
+    public List<BusinessSD_Pag4U> businessSD_Pag4Us { get; set; }
     public List<BusinessStrongholdGrowUpAttribute> strongholdList { get; set; }
     public List<BussinessRewardStruct> businessCoupons { get; set; }
     public List<BusinessActivity> ActiveData { get; set; }
     public List<PlayerCoupon> playerCoupons { get; set; }
 }
+
+public class BusinessSD_Pag4U
+{
+    public int hostIndex { get; set; }
+    //数据库里的游标
+    public int objectIndex { get; set; }
+    //物件ID
+    public string commodityID { get; set; }
+    //玩家拥有这个东西个数
+    public int objectCount { get; set; }
+}
+
+
 
 public class BussinessRewardStruct
 {
