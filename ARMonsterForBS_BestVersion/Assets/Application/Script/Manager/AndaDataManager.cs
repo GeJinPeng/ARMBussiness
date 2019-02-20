@@ -32,6 +32,9 @@ public class AndaDataManager  {
     public const string ChooseTipsView = "ChooseTipsView";
     public const string BussinessCouponItem = "BussinessCouponItem";
     public const string BusinessCouponManagerView = "BusinessCouponManagerView";
+
+
+    public const string userAdsKey = "UserAdsTexture_";
     #region 设置和更新数据
     public void SetUserData(BusinessData playerData , string token)
     {
@@ -128,6 +131,29 @@ public class AndaDataManager  {
 
     #endregion
 
+    #region 从相册读取图片
+
+    public Texture2D LoadPicture()
+    {
+        Texture2D texture = null;
+        NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
+        {
+        Debug.Log("Image path: " + path);
+        
+            if (path != null)
+            {
+                // 此Action为选取图片后的回调，返回一个Texture2D 
+               // AndaUIManager.Instance.OpenWaitBoard(true);
+                texture = NativeGallery.LoadImageAtPath(path, - 1);
+            }
+        }, "选择图片", "image/png", -1);
+
+        return texture;
+
+    }
+
+    #endregion
+
     #region 获取奖励图像
 
     public void GetRewardImg(string path , System.Action<Sprite> action )
@@ -150,6 +176,37 @@ public class AndaDataManager  {
     }
 
 
+
+    #endregion
+
+
+    #region 获取广告图像
+
+    public void GetAdsImg(string key , System.Action<Sprite> action)
+    {
+
+        string s = PlayerPrefs.GetString(key);
+
+
+        Debug.Log("Content2" + s);
+
+        if (s == "")
+        {
+            networkController.CallServerGetUserAdsImg (key, action);
+        }
+        else
+        {
+
+            byte[] vs = ConvertTool.StringToBytes(s);
+            Texture2D texture = new Texture2D(1024, 1024);
+            texture.LoadImage(vs);
+            texture = ConvertTool.ConvertToTexture2d(texture);
+            Sprite sprite = ConvertTool.ConvertToSpriteWithTexture2d(texture);
+            //if (mainData.userImage == null) mainData.userImage = sprite;
+            action(sprite);
+
+        }
+    }
 
     #endregion
 
@@ -251,6 +308,8 @@ public class AndaDataManager  {
         networkController.CallServerGetImagePor(path,callback);
     }
     #endregion
+
+   
 
 
     #region 向服务器索要系统消息

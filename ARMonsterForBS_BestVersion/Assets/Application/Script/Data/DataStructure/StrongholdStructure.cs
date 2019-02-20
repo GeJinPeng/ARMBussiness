@@ -228,5 +228,9 @@ public class PlayerStrongholdAttribute : StrongholdBaseAttribution
 }
 public class BusinessStrongholdAttribute : StrongholdBaseAttribution
 {
-
+    /// <summary>
+    /// 广告组
+    /// </summary>
+    /// <value>The ads infos.</value>
+    public List<AdsStruct> adsInfos { get;set;} 
 }

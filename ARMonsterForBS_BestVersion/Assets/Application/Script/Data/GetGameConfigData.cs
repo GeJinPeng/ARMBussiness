@@ -865,6 +865,204 @@ public static class GetGameConfigData  {
     }
     #endregion
 
+    #region 怪兽级分类
+    private static List<MonsterLevelBox> _monsterLevelBox =null;
+    public static  List<MonsterLevelBox> monsterLevelBox 
+    {
+        get
+        {
+            if(_monsterLevelBox == null)
+            {
+                _monsterLevelBox = new List<MonsterLevelBox>
+                {
+                    new MonsterLevelBox
+                    {
+                        level = 0,
+                        title = "初级星宿卡",
+                        data = new List<string>
+                        {
+                            "ms_bs_1004","ms_bs_1005","ms_bs_1007",
+                            "ms_bs_1010"
+                        }
+                    },
+                    new MonsterLevelBox
+                    {
+                        level =1,
+                        title = "高级星宿卡",
+                        data = new List<string>
+                        {
+                            "ms_bs_1006","ms_bs_1011",
+                            "ms_bs_2001"
+                        }
+                    }
+                };
+
+                #if UNITY_EDITOR
+                Debug.Log("怪兽的等级分类:" + JsonMapper.ToJson(_monsterLevelBox));
+                #endif
+            }
+            return _monsterLevelBox;
+        }
+    }
+    #endregion
+
+    #region 据点权限配置
+
+    private static List<BussinessSHRootConfig> _bussinessSHRootConfigs = null;
+    public static List<BussinessSHRootConfig> bussinessSHRootConfigs
+    {
+        get
+        {
+            if(_bussinessSHRootConfigs == null)
+            {
+                _bussinessSHRootConfigs = new List<BussinessSHRootConfig>
+                {
+                    new BussinessSHRootConfig
+                    {
+                        id = "sh_bs_00",
+                        level = 0,
+                        adsCount = 1,
+                        adsLevel = 0,
+                        monsterCount = 1,
+                        monsterLevel =  0,
+                        couponLevel = 1 ,
+                        hotValue = 10,
+                    }
+                    ,
+                     new BussinessSHRootConfig
+                    {
+                        id = "sh_bs_01",
+                        level = 1,
+                        adsCount = 1,
+                        adsLevel = 1,
+                        monsterCount = 1,
+                        monsterLevel =  0,
+                        couponLevel = 1 ,
+                        hotValue = 15,
+
+                    },
+                    new BussinessSHRootConfig
+                    {
+                        id = "sh_bs_02",
+                        level = 2 ,
+                        adsCount = 2,
+                        adsLevel = 2,
+                        monsterCount = 1,
+                        monsterLevel =  1,
+                        couponLevel = 1 ,
+                        hotValue = 20,
+
+                    },
+                    new BussinessSHRootConfig
+                    {
+                        id = "sh_bs_03",
+                        level = 3 ,
+                        adsCount = 3 ,
+                        adsLevel = 2,
+                        monsterCount = 1,
+                        monsterLevel = 1,
+                        couponLevel = 1 ,
+                        hotValue = 30,
+
+                    },
+                     new BussinessSHRootConfig
+                    {
+                        id = "sh_bs_04",
+                        level = 4 ,
+                        adsCount = 4 ,
+                        adsLevel = 2,
+                        monsterCount = 1,
+                        monsterLevel = 1,
+                        couponLevel = 1 ,
+                        hotValue = 30,
+
+                    }
+                };
+
+                #if UNITY_EDITOR
+                Debug.Log("据点权限 ：" +  JsonMapper.ToJson(_bussinessSHRootConfigs));
+                #endif
+
+              
+      
+            }
+
+            return _bussinessSHRootConfigs;
+        }
+    }
+    #endregion
+
+
+    #region 广告等级权限配置
+    private static List<AdsLevelBox> _adsLevelBox = null;
+    public  static List<AdsLevelBox> adsLevelBox 
+    {
+        get
+        {
+            if(_adsLevelBox == null)
+            {
+                _adsLevelBox = new List<AdsLevelBox>
+                { 
+                    new AdsLevelBox
+                    {
+                        level = 0 ,
+                        key = "text",
+                        title = "萌新广告",
+                        root = new List<string> { "text" },
+                    },
+                    new AdsLevelBox
+                    {
+                        level = 1,
+                        key ="texture",
+                        title = "高级广告",
+                        root = new List<string> { "text" ,"texture"},
+                    },
+                    new AdsLevelBox
+                    {
+                        level = 2,
+                        key ="video",
+                        title = "璀璨广告",
+                        root = new List<string> { "text" ,"texture","video"},
+                    }
+                };
+
+                #if UNITY_EDITOR
+
+                Debug.Log("广告位的权限：" + JsonMapper.ToJson(_adsLevelBox));
+
+                #endif
+            }
+
+            return  _adsLevelBox;
+        }
+    }
+    #endregion
+
+  
+    public static BussinessSHRootConfig GetBussinessSHRootConfigItem(string id)
+    {
+        return bussinessSHRootConfigs.FirstOrDefault(s=>s.id == id);
+    }
+    /// <summary>
+    /// 根据据点等级查询据点的所有权限配置
+    /// </summary>
+    /// <returns>The bussiness SHR oot config item.</returns>
+    /// <param name="shLevel">Sh level.</param>
+    public static BussinessSHRootConfig GetBussinessSHRootConfigItem(int shLevel)
+    {
+        return bussinessSHRootConfigs.FirstOrDefault(s => s.level == shLevel);
+    }
+
+    public static AdsLevelBox GetAdsLevelBoxItem(int level)
+    {
+        return adsLevelBox.FirstOrDefault(s=>s.level == level);
+    }
+
+    public static MonsterLevelBox GetMonsterLevelBox(int level)
+    {
+        return monsterLevelBox.FirstOrDefault(s=>s.level == level);
+    }
+
     /// <summary>
     /// 通过id 查找物件配置表中的物件
     /// </summary>

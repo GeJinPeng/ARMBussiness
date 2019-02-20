@@ -23,6 +23,8 @@ public class OpenImage : MonoBehaviour {
      
         TakePhoto(openButton);
     }
+
+
     public void TakePhoto(Button openButton,int maxSize = -1)
     {
         openButton.enabled = false;

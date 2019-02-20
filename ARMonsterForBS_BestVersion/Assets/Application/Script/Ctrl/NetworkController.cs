@@ -455,6 +455,42 @@ public class NetworkController : MonoBehaviour {
     #endregion
     #endregion
 
+    #region 上传广告数据
+
+    public void CallServerUploadAds(int bsIndex, AdsStruct adsStruct , System.Action<AdsStruct> action)
+    {
+        StartCoroutine(ExcuteCallServerUploadAds(bsIndex,adsStruct, action));
+    }
+
+    private IEnumerator ExcuteCallServerUploadAds (int bsIndex, AdsStruct adsStruct ,System.Action<AdsStruct> action)
+    {
+
+        yield return null;
+        switch(adsStruct.type)
+        {
+            case "text":
+                break;
+            case "texture":
+                // tmpData000 应该为服务回传的路径名字 , 并且数据库中保存这个路径名字
+                string token = "000";//"" AndaDataManager.Instance.mainData.playerData.userIndex.ToString()+ bsIndex.ToString() + adsStruct.itemIndex.ToString();
+                string key =  AndaDataManager.userAdsKey + token;
+                //上传成功之后，本地也会保存一份图片信 key值就是 基础key + 回传的tmpData000
+                Debug.Log("Content" + adsStruct.content);
+
+                PlayerPrefs.SetString(key, adsStruct.content);
+                adsStruct.content = key;//广告内容替换成图片的路径,然后回传
+
+                Debug.Log("key" + key);
+                break;
+            case "video":
+                break;
+        }
+
+        action(adsStruct);
+    }
+
+    #endregion
+
     #region 往商家据点里放入奖励
     public void CallServerInsertStrongholdReward(int strongholdIndex, int rewardIndex, System.Action<bool,int> callback)
     {
@@ -556,7 +592,39 @@ public class NetworkController : MonoBehaviour {
         }
     }
     #endregion
+    #region 向服务器所以广告的图片
 
+    public void CallServerGetUserAdsImg(string _key, System.Action<Sprite> callback)
+    {
+        string key = _key;
+        string path = networkAdress4 + _key;
+        StartCoroutine(ExcuteCallServerGetUserAdsImg(key,path, callback));
+    }
+
+    private IEnumerator ExcuteCallServerGetUserAdsImg(string key, string path, System.Action<Sprite> callback)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW wWW = new WWW(path);
+        yield return wWW;
+
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (string.IsNullOrEmpty(wWW.error))
+        {
+            Texture2D texture2D = ConvertTool.ConvertToTexture2d(wWW.texture);
+            Sprite sprite = ConvertTool.ConvertToSpriteWithTexture2d(texture2D);
+            byte[] b = texture2D.EncodeToPNG();
+            string t = ConvertTool.bytesToString(b);
+            PlayerPrefs.SetString(key, t);
+            callback(sprite);
+        }
+        else
+        {
+            AndaUIManager.Instance.PlayTips(wWW.error);
+        }
+
+    }
+
+    #endregion
     #region 向服务器要头像数据
     public void CallServerGetImagePor(string address ,System.Action<Sprite> callback)
     {
