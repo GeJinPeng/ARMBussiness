@@ -171,22 +171,45 @@ public class AdsLevelBox
 }
 
 public class AdsStruct
-{
+{ 
+
+    /// <summary>
+    /// 广告的主键
+    /// </summary>
+    /// <value>The content.</value>
+    public int businessAdsIndex { get; set; }
     /// <summary>
     /// 第几条广告
     /// </summary>
     /// <value>The index of the item.</value>
-    public int itemIndex{get;set;}
+    public int itemIndex { get; set; }
     /// <summary>
     /// 是什么类型的广告
     /// </summary>
     /// <value>The type.</value>
-    public string type{get;set;}
+    public string type { get; set; }
     /// <summary>
     /// 广告内容是啥
     /// </summary>
     /// <value>The content.</value>
-    public string content{get;set;}
+    public string content { get; set; }
+    /// <summary>
+    /// 状态（0下架1上架2废弃）
+    /// </summary>
+    /// <value>The content.</value>
+    public int status { get; set; }
+    /// <summary>
+    /// 广告浏览的次数便于统计
+    /// </summary>
+    /// <value>The content.</value>
+    public int browseTimes { get; set; }
+
+}
+
+public class AdsRule
+{
+    public int widthLimit{get;set;}
+    public int heightLimit{get;set;}
 }
 
 

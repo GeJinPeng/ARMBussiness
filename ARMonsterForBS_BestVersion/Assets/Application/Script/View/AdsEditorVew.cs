@@ -29,44 +29,43 @@ public class AdsEditorVew : MonoBehaviour {
     public void OnEnable()
     {
         StartView();
-        SetInfo(new BusinessStrongholdAttribute
-        {
-            strongholdLevel =  2,
-        });
+        SetInfo(AndaDataManager.Instance.mainData.businessStrongholdAttributes[0]);
     }
 
     public void StartView()
     {
         itemInfo_AdsItem.callback_clickItem = CallBackClickEditorBar;
 
-        adsEditorView_EdiorBar.callbcak_saveFinshForSprite = CallBackSaveEditorForSprite;
+        //adsEditorView_EdiorBar.callbcak_saveFinshForSprite = CallBackSaveEditorForSprite;
         adsEditorView_EdiorBar.callbcak_saveFinsh = CallbackSaveEditor;
     }
 
     public void SetInfo(BusinessStrongholdAttribute businessStrongholdAttribute)
     {
         bsa = businessStrongholdAttribute;
-        bsa.adsInfos = new List<AdsStruct>
+        bsa.strongholdLevel =3;
+        /*bsa.adsInfos = new List<AdsStruct>
         {
             new AdsStruct()
             {
                 itemIndex = 0,
-                type = "texture",
-                content = AndaDataManager.userAdsKey + "000",
+                type = "text",
+                content = "这是一条广告",
             },
             new AdsStruct
             {
                 itemIndex = 1,
-                type = "text",
-                content = "这是二条广告哦",
+                type = "texture",
+                content = "UserAdsPath23400003",
             },
             new AdsStruct
             {
                 itemIndex = 2,
-                type = "text",
-                content = "这是三条广告哦",
+                type = "video",
+                content = "http://192.168.1.158.vvs.mp4",
             }
-        }; //以上为测试数据
+        }; //以上为测试数据*/
+
         bussinessSHRootConfig = GetGameConfigData.GetBussinessSHRootConfigItem(bsa.strongholdLevel);
         ResetAdsSturct(bsa.adsInfos);
         SetAdsNewItem();
@@ -80,14 +79,18 @@ public class AdsEditorVew : MonoBehaviour {
     private void ResetAdsSturct( List<AdsStruct> infos)
     {
         adsStruct = new List<AdsStruct>();
-        int count = infos.Count;
-        for(int i = 0 ; i < count; i++ )
+        if(infos!=null && infos.Count!=0)
         {
-            AdsStruct ad = new AdsStruct();
-            ad.itemIndex = infos[i].itemIndex;
-            ad.content = infos[i].content;
-            ad.type = infos[i].type;
-            adsStruct.Add(ad);
+            int count = infos.Count;
+            for (int i = 0; i < count; i++)
+            {
+                AdsStruct ad = new AdsStruct();
+                ad.itemIndex = infos[i].itemIndex;
+                ad.content = infos[i].content;
+                ad.type = infos[i].type;
+                adsStruct.Add(ad);
+            }
+
         }
 
     }
@@ -200,7 +203,7 @@ public class AdsEditorVew : MonoBehaviour {
     {
         adsStruct[currentIndex] = info;
 
-        itemInfo_AdsItem.SetItemTexture(_sp);
+        itemInfo_AdsItem.SetItemTexture(adsStruct[currentIndex],_sp);
     }
 
 }

@@ -459,34 +459,59 @@ public class NetworkController : MonoBehaviour {
 
     public void CallServerUploadAds(int bsIndex, AdsStruct adsStruct , System.Action<AdsStruct> action)
     {
-        StartCoroutine(ExcuteCallServerUploadAds(bsIndex,adsStruct, action));
+
+        var _wForm = new WWWForm();
+
+        _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
+        _wForm.AddField("itemIndex", adsStruct.itemIndex);
+        _wForm.AddField("type", adsStruct.type);
+        _wForm.AddField("content", adsStruct.content);
+        _wForm.AddField("status", 1);
+        _wForm.AddField("strongholdIndex", bsIndex);
+
+        string path = networkAdress2 + "BusinessMain/AdsInsret";
+
+        StartCoroutine(ExcuteCallServerUploadAds(bsIndex, adsStruct, path, _wForm,action));
     }
 
-    private IEnumerator ExcuteCallServerUploadAds (int bsIndex, AdsStruct adsStruct ,System.Action<AdsStruct> action)
+    private IEnumerator ExcuteCallServerUploadAds (int bsIndex, AdsStruct adsStruct , string path, WWWForm _wwwform,System.Action<AdsStruct> action)
     {
 
-        yield return null;
-        switch(adsStruct.type)
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(path, _wwwform);
+        yield return postData;
+
+        AndaUIManager.Instance.OpenWaitBoard(false);
+
+        if(string.IsNullOrEmpty(postData.error))
         {
-            case "text":
-                break;
-            case "texture":
-                // tmpData000 应该为服务回传的路径名字 , 并且数据库中保存这个路径名字
-                string token = "000";//"" AndaDataManager.Instance.mainData.playerData.userIndex.ToString()+ bsIndex.ToString() + adsStruct.itemIndex.ToString();
-                string key =  AndaDataManager.userAdsKey + token;
-                //上传成功之后，本地也会保存一份图片信 key值就是 基础key + 回传的tmpData000
-                Debug.Log("Content" + adsStruct.content);
 
-                PlayerPrefs.SetString(key, adsStruct.content);
-                adsStruct.content = key;//广告内容替换成图片的路径,然后回传
+            BusinessAds businessAds = JsonMapper.ToObject<BusinessAds>(postData.text);
+            if(businessAds.code == "200")
+            { 
+                if(adsStruct.type == "texture")
+                {
+                    string key = AndaDataManager.userAdsKey + businessAds.ads.content;
 
-                Debug.Log("key" + key);
-                break;
-            case "video":
-                break;
+                    Debug.Log("InsertKey:" + key);
+
+                    PlayerPrefs.SetString(key, adsStruct.content);
+                }
+                action(adsStruct);
+            }
+            else
+            {
+                AndaUIManager.Instance.PlayTips("检查网络:500");
+            }
+
+
+        }else
+        {
+
+
+            AndaUIManager.Instance.PlayTips("检查网络" + postData.error);
         }
 
-        action(adsStruct);
     }
 
     #endregion

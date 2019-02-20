@@ -349,3 +349,12 @@ public class SearchObject
 
 #endregion
 
+
+
+#region 广告
+public class BusinessAds : Result
+{
+    public AdsStruct ads { get; set; }
+}
+#endregion
+

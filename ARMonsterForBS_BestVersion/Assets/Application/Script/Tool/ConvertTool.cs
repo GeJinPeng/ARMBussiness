@@ -24,7 +24,7 @@ public static class ConvertTool  {
         tmp.coupons = bsga.coupons;
         tmp.fightMonsterListIndex = bsga.strongholdFightMonsterList;
         tmp.strongholdPosition = bsga.strongholdPosition;
-         
+        tmp.adsInfos = bsga.adsInfos;
         return tmp;
     }
 

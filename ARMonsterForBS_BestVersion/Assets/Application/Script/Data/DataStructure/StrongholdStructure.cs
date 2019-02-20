@@ -109,6 +109,13 @@ public class StrongholdGrowUpAttribute
     public string headImage { get; set; }
     public string autograph { get; set; }
     public List<int> activitys { get; set; }
+
+
+    /// <summary>
+    /// 商家用的boss ID 
+    /// </summary>
+    /// <value>The boss identifier.</value>
+    public string bossID { get; set; }
 }
 
 public class PlayerStrongHoldGrowUpAttribute: StrongholdGrowUpAttribute
@@ -133,6 +140,13 @@ public class BusinessStrongholdGrowUpAttribute : StrongholdGrowUpAttribute
     public BusinessData BusinessData{get;set;}
     public List<BusinessActivity> businessActivity { get; set; }
     public List<BussinessRewardStruct> businessCoupons { get; set; }
+ 
+
+    /// <summary>
+    /// 广告组
+    /// </summary>
+    /// <value>The ads infos.</value>
+    public List<AdsStruct> adsInfos { get; set; }
 }
 
 

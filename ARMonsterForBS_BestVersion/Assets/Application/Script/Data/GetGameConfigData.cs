@@ -1026,14 +1026,32 @@ public static class GetGameConfigData  {
                     }
                 };
 
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
 
                 Debug.Log("广告位的权限：" + JsonMapper.ToJson(_adsLevelBox));
 
-                #endif
+#endif
             }
 
             return  _adsLevelBox;
+        }
+    }
+    #endregion
+
+    #region 广告图片上传规则
+    private static AdsRule _adsRule = null;
+    public static AdsRule adsRule 
+    {
+        get {
+            if(_adsRule == null)
+            {
+                _adsRule =new AdsRule
+                {
+                    widthLimit = 256,
+                    heightLimit = 454,
+                };
+            }
+            return _adsRule;
         }
     }
     #endregion

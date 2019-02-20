@@ -14,7 +14,7 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
     public GameObject comfirmBtn;
      
     public System.Action<AdsStruct>callbcak_saveFinsh;
-    public System.Action<Sprite,AdsStruct> callbcak_saveFinshForSprite;
+  // public System.Action<Sprite,AdsStruct> callbcak_saveFinshForSprite;
     private AdsStruct adsStruct;
     private BussinessSHRootConfig bsrc;
 
@@ -24,7 +24,8 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
     private Toggle lastToogle;
     private int currentToggleIndex;
     private string currentType;
-
+    private Sprite resultSprite;
+    private Texture2D result;
     public void OpenEditorBar(AdsStruct _adsStruct , BussinessSHRootConfig _bsrc)
     {
         adsStruct = _adsStruct;
@@ -39,6 +40,7 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
                 toggles[0].isOn = true;
                 break;
             case "texture":
+                //adsRule = ;
                 toggles[1].isOn = true;
 
                 break;
@@ -80,6 +82,23 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
 
     private void SetValue(int index)
     {
+
+
+        if (result != null)
+        {
+            DestroyImmediate(result);
+
+            DestroyImmediate(resultSprite);// = null;
+
+            textureInput.sprite = null;
+
+            texftValue = null;
+
+        }
+
+
+
+
         textInput.text = "";
         videoInput.text = "";
         textureInput.sprite = null;
@@ -132,52 +151,58 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
 
     public void SetTexture()
     {
+
+
         AndaUIManager.Instance.OpenWaitBoard(true);
+
+
 #if UNITY_EDITOR
 
-        StartCoroutine(PCLoadTexture());
-
-
-
+         StartCoroutine(PCLoadTexture());
 #else
 
-        NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
+         NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
         {
-            Debug.Log("Image path: " + path);
-
             if (path != null)
             {
-                // 此Action为选取图片后的回调，返回一个Texture2D 
-                // AndaUIManager.Instance.OpenWaitBoard(true);
-
                 Texture2D tt = NativeGallery.LoadImageAtPath(path, -1);
-               
+
                 if (tt == null)
                 {
                     OutEditorBar();
-                }else
+                }
+                else
                 {
-                    var rect = new Rect(0, 0, tt.width, tt.height);
-                    Texture2D result = new Texture2D(tt.width, tt.height, tt.format, false);
-                    RenderTexture renderTexture = RenderTexture.GetTemporary((int)tt.width, (int)tt.height, 32);
+
+                    if (tt.width > GetGameConfigData.adsRule.widthLimit || tt.height > GetGameConfigData.adsRule.heightLimit)
+                    {
+                        AndaUIManager.Instance.PlayTipsForChoose("静态广告的尺寸必须为 256 * 454 像素，请遵循个上传规则", 1, "好", "", null, null);
+                        DestroyImmediate(tt);
+                        AndaUIManager.Instance.OpenWaitBoard(false);
+                        return;
+                    }
+
+                    result = new Texture2D(GetGameConfigData.adsRule.widthLimit, GetGameConfigData.adsRule.heightLimit, tt.format, false);
+                    RenderTexture renderTexture = RenderTexture.GetTemporary(result.width, result.height, 32);
                     Graphics.Blit(tt, renderTexture);
                     RenderTexture.active = renderTexture;
-                    result.ReadPixels(rect, 0, 0);
+                    result.ReadPixels(new Rect(0, 0, result.width, result.height), 0, 0);
                     result.Apply();
 
                     texftValue = ConvertTool.bytesToString(result.EncodeToPNG());
 
-                    textureInput.sprite = ConvertTool.ConvertToSpriteWithTexture2d(tt);
+                    textureInput.sprite = Sprite.Create(result, new Rect(0, 0, result.width, result.height), new Vector2(0.5f, 0.5f));
 
                     ChangeContent();
+
+                    DestroyImmediate(tt);
                 }
 
                 AndaUIManager.Instance.OpenWaitBoard(false);
             }
         }, "选择图片", "image/png", -1);
-
+         
 #endif
-
 
 
 
@@ -185,21 +210,37 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
 
     private IEnumerator PCLoadTexture()
     {
-        string filePath = "file://" + Application.dataPath + @"/Application/Art/Texture/tmp01.png";
+        string filePath = "file://" + Application.dataPath + @"/Application/Art/Texture/ads4.png";
 
         WWW www  = new WWW(filePath);
 
         yield return www;
 
-        texftValue = ConvertTool.bytesToString(www.texture.EncodeToPNG());
+        if(www.texture.width > GetGameConfigData.adsRule.widthLimit || www.texture.height> GetGameConfigData.adsRule.heightLimit)
+        {
 
-        Texture2D t2d = new Texture2D(1080,1920);
+            AndaUIManager.Instance.PlayTipsForChoose("静态广告的尺寸必须为 256 * 454 像素，请遵循个上传规则",1,"好" ,"",null,null);
+            DestroyImmediate(www.texture);
+            AndaUIManager.Instance.OpenWaitBoard(false);
+            yield break;
+        }
 
-        t2d.LoadImage(www.texture.EncodeToPNG());
+        result = new Texture2D(GetGameConfigData.adsRule.widthLimit, GetGameConfigData.adsRule.heightLimit);
 
-        textureInput.sprite = Sprite.Create(t2d, new Rect(0, 0, t2d.width, t2d.height),
-                                            new Vector2(0.5f, 0.5f));
+        byte[] bt = www.texture.EncodeToPNG();
+
+        result.LoadImage(www.texture.EncodeToPNG());
+
+        texftValue = ConvertTool.bytesToString(result.EncodeToPNG());
+       
+        resultSprite = Sprite.Create(result, new Rect(0, 0, result.width, result.height),
+                                     new Vector2(0.5f, 0.5f));
+        textureInput.sprite = resultSprite;
+
         AndaUIManager.Instance.OpenWaitBoard(false);
+
+
+        DestroyImmediate(www.texture);
 
         ChangeContent();
 
@@ -228,7 +269,7 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
 
     private void Upload()
     {
-        AndaDataManager.Instance.networkController.CallServerUploadAds(1, new AdsStruct
+        AndaDataManager.Instance.networkController.CallServerUploadAds(58284, new AdsStruct
         {
             itemIndex = adsStruct.itemIndex,
             type = GetGameConfigData.GetAdsLevelBoxItem(currentToggleIndex).key,
@@ -258,28 +299,28 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
 
     private void CallBackUploadFinish(AdsStruct infos)
     {
-        if(currentToggleIndex == 1)
+        if (callbcak_saveFinsh != null)
         {
-            if (callbcak_saveFinshForSprite != null)
-            {
-                callbcak_saveFinshForSprite(textureInput.sprite, infos);
-            }
+            callbcak_saveFinsh(infos);
         }
-        else
+        if(result!=null)
         {
-            if (callbcak_saveFinsh != null)
-            {
-                callbcak_saveFinsh(infos);
-            }
+            DestroyImmediate(result);
+
+            DestroyImmediate(resultSprite);// = null;
+
+            textureInput.sprite = null;
+
+            texftValue = null;
+
         }
+
         OutEditorBar();
     }
 
     private void OutEditorBar()
     {
         toggleGroup.SetAllTogglesOff();
-
-
         barAnimator.Play("FadeOut");
     }
 }

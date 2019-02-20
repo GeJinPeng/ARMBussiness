@@ -16,6 +16,9 @@ public class ItemInfo_AdsItem : MonoBehaviour {
 
     public System.Action<AdsStruct> callback_clickItem;
 
+    private Texture2D t2d;
+
+    private byte[] vs;
     public void ClickItem()
     {
         if(callback_clickItem!=null)
@@ -30,8 +33,10 @@ public class ItemInfo_AdsItem : MonoBehaviour {
         SetItemInfo();
     }
      
-    public void SetItemTexture(Sprite _sp)
+    public void SetItemTexture(AdsStruct ast, Sprite _sp)
     {
+        adsStruct = ast;
+
         textContent.gameObject.SetActive(false);
        
         videoPlayerContent.gameObject.SetActive(false);
@@ -45,6 +50,12 @@ public class ItemInfo_AdsItem : MonoBehaviour {
     private void SetItemInfo()
     {
        
+        if(t2d!=null)
+        {
+            vs = null;
+            DestroyImmediate(t2d);
+            DestroyImmediate(imageContent.sprite);
+        }
         textContent.gameObject.SetActive(false);
         imageContent.gameObject.SetActive(false);
         videoPlayerContent.gameObject.SetActive(false);
@@ -60,24 +71,17 @@ public class ItemInfo_AdsItem : MonoBehaviour {
                 textContent.text = adsStruct.content;
                 break;
             case "texture":
+             
                 imageContent.gameObject.SetActive(true);
 
-                string s = PlayerPrefs.GetString(adsStruct.content);
-
-                byte[] vs = ConvertTool.StringToBytes(s);
-
-                Texture2D texture = new Texture2D(1080, 1920);
-
-                texture.LoadImage(vs);
-                texture = ConvertTool.ConvertToTexture2d(texture);
-
-                imageContent.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
+                string s = PlayerPrefs.GetString(AndaDataManager.userAdsKey + adsStruct.content);
+                vs = ConvertTool.StringToBytes(s);
+                t2d = new Texture2D(GetGameConfigData.adsRule.widthLimit, GetGameConfigData.adsRule.heightLimit);
+                t2d.LoadImage(vs);
+                imageContent.sprite = Sprite.Create(t2d, new Rect(0,0, t2d.width, t2d.height),
                                                     new Vector2(0.5f, 0.5f));
-                /*Debug.Log("Key2" + adsStruct.content) ;
-                AndaDataManager.Instance.GetAdsImg(adsStruct.content , (result=>
-                {
-                    imageContent.sprite = result;
-                }));*/
+
+                AndaUIManager.Instance.OpenWaitBoard(false);
                 break;
             case "video":
                 videoPlayerContent.gameObject.SetActive(true);

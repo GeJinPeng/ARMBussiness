@@ -1,0 +1,82 @@
+public class BussinessSHRootConfig
+{
+    /// <summary>
+    /// 对应的物件ID
+    /// </summary>
+    /// <value>The identifier.</value>
+    public string id {get;set;}
+
+    /// <summary>
+    /// 据点的等级
+    /// </summary>
+    /// <value>The level.</value>
+    public int level {get;set;}
+
+    /// <summary>
+    /// 拥有的怪广为 数量
+    /// </summary>
+    /// <value>The ads count.</value>
+    public int adsCount{get;set;}
+    /// <summary>
+    /// 广告的的等级 0 = 文字， 1  = 图像 2 = 视频
+    /// </summary>
+    /// <value>The ads level.</value>
+    public int adsLevel{get;set;}
+
+    /// <summary>
+    /// 可放怪兽的最大数量，暂时都是1个
+    /// </summary>
+    /// <value>The monster count.</value>
+    public int monsterCount {get;set; }
+    /// <summary>
+    /// 什么级别的怪兽可以放在这个据点上 ， monsterLevel = 0 小于等于0级的怪兽可放， monsterLEVel =1 ，代表1级及一下的怪兽可以放
+    /// </summary>
+    /// <value>The monster level.</value>
+    public int monsterLevel{get;set;}
+    /// <summary>
+    /// 暂时无用
+    /// </summary>
+    /// <value>The coupon level.</value>
+    public int couponLevel{get;set;}
+
+    public int hotValue{get;set;}
+}
+
+public class MonsterLevelBox
+{
+    public int level {get;set;}
+    public string title { get; set; }
+    public List<string> data {get;set;}
+}
+
+public class AdsLevelBox
+{
+    public int level{get;set;}
+
+    public string key {get;set;}
+
+    public string title {get;set;}
+
+    public List<string> root {get;set;}
+
+    
+}
+
+public class AdsStruct
+{
+    /// <summary>
+    /// 第几条广告
+    /// </summary>
+    /// <value>The index of the item.</value>
+    public int itemIndex{get;set;}
+    /// <summary>
+    /// 是什么类型的广告
+    /// </summary>
+    /// <value>The type.</value>
+    public string type{get;set;}
+    /// <summary>
+    /// 广告内容是啥
+    /// </summary>
+    /// <value>The content.</value>
+    public string content{get;set;}
+}
