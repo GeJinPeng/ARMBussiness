@@ -49,7 +49,9 @@ public class LeftPanelView : MonoBehaviour {
     public void ShowPlayerCouponView()
     {
         Close();
-        playerCouponView.ShowMain();
+        GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.PlayerCouponrView);
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+        view.GetComponent<PlayerCouponView>().ShowMain();
     }
 
     public void ShowStrongholdInfoBar()

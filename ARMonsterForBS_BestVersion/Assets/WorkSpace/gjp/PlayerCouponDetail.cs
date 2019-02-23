@@ -94,6 +94,7 @@ public class PlayerCouponDetail : MonoBehaviour {
     {
         gameObject.SetActive(false);
         content.transform.position = new Vector3(content.transform.position.x, 0, content.transform.position.z);
+        Destroy(gameObject);
     }
     public void Close()
     {

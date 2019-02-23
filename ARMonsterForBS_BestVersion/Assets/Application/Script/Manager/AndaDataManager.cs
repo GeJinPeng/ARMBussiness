@@ -75,6 +75,7 @@ public class AndaDataManager  {
     public const string ChooseTipsView = "ChooseTipsView";
     public const string BussinessCouponItem = "BussinessCouponItem";
     public const string BusinessCouponManagerView = "BusinessCouponManagerView";
+    public const string PlayerCouponrView = "PlayerCouponView";
     public const string ItemInfo_SmallAdsInfomation = "ItemInfo_SmallAdsInfomation";
     public const string ItemInfo_StrongholdInformation= "ItemInfo_StrongholdInformation";
     public const string AdsEditorView = "AdsEditorView";

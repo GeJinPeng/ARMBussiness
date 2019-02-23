@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerCouponView : MonoBehaviour {
+public class PlayerCouponView : ViewBasic
+{
     public GameObject main;
 
 
@@ -53,6 +54,7 @@ public class PlayerCouponView : MonoBehaviour {
     public void SetActiveFalse()
     {
         main.SetActive(false);
+        Destroy(gameObject);
     }
     public void InstanceContentPanel()
     {
