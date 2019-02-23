@@ -85,14 +85,14 @@ public class ItemInfo_AdsItem : MonoBehaviour {
                 break;
             case "video":
                 videoPlayerContent.gameObject.SetActive(true);
-                string path = "";
-                if(adsStruct.content.Substring(0,7)!="http://")
+                string path = adsStruct.content;
+                /*if (adsStruct.content.Substring(0,7) =="http://"  )
                 {
                     path = "http://" + adsStruct.content;
-                }else
+                }else if ()
                 {
                     path = adsStruct.content;
-                }
+                }*/
                 videoPlayerContent.url = path;
                 videoPlayerContent.Play();
                 break;

@@ -25,6 +25,8 @@ public static class ConvertTool  {
         tmp.fightMonsterListIndex = bsga.strongholdFightMonsterList;
         tmp.strongholdPosition = bsga.strongholdPosition;
         tmp.adsInfos = bsga.adsInfos;
+        tmp.description = bsga.description;
+        tmp.monsterCardID = bsga.bossID;
         return tmp;
     }
 

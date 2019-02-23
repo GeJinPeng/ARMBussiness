@@ -435,7 +435,7 @@ public class BusinessCouponView : ViewBasic {
 
 
     private Vector3 startMousePose;
-    public void Update()
+    public void FixedUpdate()
     {
         if(gameObject.activeSelf)
         {

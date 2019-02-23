@@ -34,6 +34,16 @@ public class AndaUIManager {
         Debug.Log("Tips:" + tipsCountent);
     }
 
+    public void PlayCheckNetErrorTips()
+    {
+        tipsTool.SetInfo("请检查网络", 4f);
+    }
+
+    public void PlayTipsForBuySuccess()
+    {
+        tipsTool.SetInfo("购买成功", 2f);
+    }
+
     public void PlayTipsForChoose(string content, int tipsType,string btn1Title, string btn2Title, System.Action comfrim ,System.Action cancel)
     {
         GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.ChooseTipsView);

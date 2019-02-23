@@ -18,7 +18,7 @@ public class ItemInfo_MapNewShItem : MonoBehaviour {
     {
         callbackClickComfirm =_callbackClickComfirm;
         callbackClickCancel = _callbackClickCancel;
-        levelBoard.sprite = _lvBoard;
+        //levelBoard.sprite = _lvBoard;
         icon.sprite = _icon;
         shName.text = _name;
         OpenChooseButton();

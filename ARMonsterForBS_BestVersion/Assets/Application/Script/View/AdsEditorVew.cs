@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-public class AdsEditorVew : MonoBehaviour {
+public class AdsEditorVew : ViewBasic {
 
     public ToggleGroup toggleGroup;
     public AdsEditorView_EdiorBar adsEditorView_EdiorBar;
@@ -21,98 +21,37 @@ public class AdsEditorVew : MonoBehaviour {
     private BusinessStrongholdAttribute bsa ;
     private int currentIndex;
     private float lateTimer;
-
+    public System.Action callback_updateAds;
     private List<string> titles = new List<string>
     {
         "1号广告位" ,"2号广告位" ,"3号广告位" ,"4号广告位"
     };
-    public void OnEnable()
+
+    public void OnDisable()
     {
-        StartView();
-        SetInfo(AndaDataManager.Instance.mainData.businessStrongholdAttributes[0]);
+        itemInfo_AdsItem.callback_clickItem = null;
+
+        adsEditorView_EdiorBar.callbcak_saveFinsh = null;
     }
 
-    public void StartView()
+    public void OnEnable()
     {
+        isMe = true;
+
         itemInfo_AdsItem.callback_clickItem = CallBackClickEditorBar;
 
-        //adsEditorView_EdiorBar.callbcak_saveFinshForSprite = CallBackSaveEditorForSprite;
         adsEditorView_EdiorBar.callbcak_saveFinsh = CallbackSaveEditor;
     }
 
-    public void SetInfo(BusinessStrongholdAttribute businessStrongholdAttribute)
+    public void SetInfo(BusinessStrongholdAttribute _bsa, List<AdsStruct> adsStructs , BussinessSHRootConfig _bussinessSHRootConfig)
     {
-        bsa = businessStrongholdAttribute;
-        bsa.strongholdLevel =3;
-        /*bsa.adsInfos = new List<AdsStruct>
-        {
-            new AdsStruct()
-            {
-                itemIndex = 0,
-                type = "text",
-                content = "这是一条广告",
-            },
-            new AdsStruct
-            {
-                itemIndex = 1,
-                type = "texture",
-                content = "UserAdsPath23400003",
-            },
-            new AdsStruct
-            {
-                itemIndex = 2,
-                type = "video",
-                content = "http://192.168.1.158.vvs.mp4",
-            }
-        }; //以上为测试数据*/
-
-        bussinessSHRootConfig = GetGameConfigData.GetBussinessSHRootConfigItem(bsa.strongholdLevel);
-        ResetAdsSturct(bsa.adsInfos);
-        SetAdsNewItem();
+        bsa =_bsa;
+        adsStruct = adsStructs;
+        bussinessSHRootConfig = _bussinessSHRootConfig;
         SelectAdsIndex();
     }
 
-    /// <summary>
-    /// 复制内容
-    /// </summary>
-    /// <param name="infos">Infos.</param>
-    private void ResetAdsSturct( List<AdsStruct> infos)
-    {
-        adsStruct = new List<AdsStruct>();
-        if(infos!=null && infos.Count!=0)
-        {
-            int count = infos.Count;
-            for (int i = 0; i < count; i++)
-            {
-                AdsStruct ad = new AdsStruct();
-                ad.itemIndex = infos[i].itemIndex;
-                ad.content = infos[i].content;
-                ad.type = infos[i].type;
-                adsStruct.Add(ad);
-            }
 
-        }
-
-    }
-
-    /// <summary>
-    /// 补齐空缺
-    /// </summary>
-    private void SetAdsNewItem()
-    {
-        int count = bussinessSHRootConfig.adsCount; 
-        for(int i = 0; i < count; i ++ )
-        {
-            if(i >= adsStruct.Count)
-            {
-                AdsStruct ad = new AdsStruct();
-                ad.itemIndex = i;
-                ad.content = "+";
-                ad.type = "newItem";
-                adsStruct.Add(ad);
-            }
-        }
-    }
 
     public void SelectAdsIndex()
     {
@@ -182,7 +121,8 @@ public class AdsEditorVew : MonoBehaviour {
     /// <param name="info">Info.</param>
     private void CallBackClickEditorBar(AdsStruct info)
     {
-        adsEditorView_EdiorBar.OpenEditorBar(info,bussinessSHRootConfig);
+        isMe  = false;
+        adsEditorView_EdiorBar.OpenEditorBar(bsa.strongholdIndex, info,bussinessSHRootConfig);
     }
  
 
@@ -192,11 +132,26 @@ public class AdsEditorVew : MonoBehaviour {
     /// <param name="info">Info.</param>
     private void CallbackSaveEditor(AdsStruct info)
     {
+        isMe = true;
+        if (info == null)
+        {
+            return;
+        }
         adsStruct[currentIndex] = info;
 
         //重新构建item
 
         BuildAdsItem();
+
+        CallBackUpdateAds();
+    }
+
+    public void  CallBackUpdateAds()
+    {
+        if(callback_updateAds!=null)
+        {
+            callback_updateAds();
+        }
     }
 
     private void CallBackSaveEditorForSprite(Sprite _sp, AdsStruct info)
@@ -206,4 +161,28 @@ public class AdsEditorVew : MonoBehaviour {
         itemInfo_AdsItem.SetItemTexture(adsStruct[currentIndex],_sp);
     }
 
+    private Vector3 startMousePose;
+    public void FixedUpdate()
+    {
+        if (gameObject.activeSelf)
+        {
+            if (isMe)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    startMousePose = Input.mousePosition;
+                }
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    //float delta = Mathf.Abs(i)
+                    if (Input.mousePosition.x - startMousePose.x > 500)
+                    {
+                        lastView.IsYou(true);
+                        Destroy(gameObject);
+                    }
+                }
+            }
+        }
+    }
 }

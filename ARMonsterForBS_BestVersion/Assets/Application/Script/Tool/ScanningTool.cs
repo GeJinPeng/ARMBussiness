@@ -16,6 +16,12 @@ public class ScanningTool: MonoBehaviour
     private float timer = 0;
     private int width;
 
+
+    public void OnEnable()
+    {
+        Scanning();
+    }
+
     IEnumerator ScanningCoroutine()
     {
         barcodeReader = new BarcodeReader();
@@ -53,10 +59,9 @@ public class ScanningTool: MonoBehaviour
     }
     public void StopScanning(PlayerCouponRequest info)
     {
-        webCameraTexture.Stop();
-        IsScanning = false;
         cameraTexture.gameObject.SetActive(false);
-
+        webCameraTexture.Stop();
+       
         if (info != null)
         {
             if (info.code == "200")
@@ -70,6 +75,7 @@ public class ScanningTool: MonoBehaviour
                 txt.text = info.detail;
             }
         }
+        Destroy(gameObject);
     }
     void ScreenChange()//屏幕横竖屏切换
     {
@@ -90,41 +96,56 @@ public class ScanningTool: MonoBehaviour
             cameraTexture.rectTransform.sizeDelta = new Vector2(Screen.width, Screen.height);
         }
     }
-    void Update()
+    void FixedUpdate()
     {
         if (IsScanning)
         {
             timer += Time.deltaTime;
 
-            if (timer > 0.5f) //0.5秒扫描一次
+            if (timer > 0.5f && !isChecking) //0.5秒扫描一次
             {
-                StartCoroutine(ScanQRcode());
+                isChecking= true;
+                data = webCameraTexture.GetPixels32();
+                DecodeQR(webCameraTexture.width, webCameraTexture.height);
                 timer = 0;
             }
            // ScreenChange();
         }
     }
 
-    IEnumerator ScanQRcode()
+    private bool isChecking = false;
+
+   /* IEnumerator ScanQRcode()
     {
         data = webCameraTexture.GetPixels32();
         DecodeQR(webCameraTexture.width, webCameraTexture.height);
         yield return new WaitForEndOfFrame();
-    }
+    }*/
 
     private void DecodeQR(int width, int height)
     {
         var br = barcodeReader.Decode(data, width, height);
-        if (br != null)
+
+        if(br == null)
         {
-            if (br.Text == "")
-                return;
-            Debug.Log(br.Text);
-            if (br.Text != txt.text)
+           
+        }else
+        {
+            if(string.IsNullOrEmpty(br.Text))
             {
-                IsScanning = false;
-                AndaDataManager.Instance.QRCheackCoupon(br.Text, StopScanning);
+
+            }
+            else
+            {
+                if (br.Text != txt.text)
+                {
+                    IsScanning = false;
+
+                    AndaDataManager.Instance.QRCheackCoupon(br.Text, StopScanning);
+                }
             }
         }
+
+        isChecking = false; 
     }
 }

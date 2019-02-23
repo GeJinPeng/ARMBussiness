@@ -175,37 +175,142 @@ public class NetworkController : MonoBehaviour {
         _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
         _wForm.AddField("HoldId", HoldId);
         _wForm.AddField("NickName", nickName);
+        _wForm.AddField("description", AndaDataManager.Instance.mainData.playerData.autograph);
         _wForm.AddField("LocationName", locationName);
-        Debug.Log("positionX" + positionX);
-        Debug.Log("positionY" + positionY);
         //经纬度 顺序  这里跟服务上的相反
         _wForm.AddField("PositionX", positionY.ToString());
         _wForm.AddField("PositionY", positionX.ToString());
-
-        //--
-        string path = networkAdress2 + "StrongHold/AddBusinessStrongHold";
+        string path = networkAdress2 + "BusinessMain/CreateStronghold";
         StartCoroutine(ExcuteUploadPlayerstornghold(path, _wForm, callback));
     }
 
     private IEnumerator ExcuteUploadPlayerstornghold(string _url, WWWForm _wForm, System.Action<BusinessStrongholdAttribute> callback)
     {
         AndaUIManager.Instance.OpenWaitBoard(true);
-        Debug.Log("uploading");
+
         WWW postData = new WWW(_url, _wForm);
         yield return postData;
         AndaUIManager.Instance.OpenWaitBoard(false);
-        Debug.Log("finish");
+
         if (postData.error != null)
         {
-            Debug.Log(postData.error);
+            AndaUIManager.Instance.PlayTips("postDataError" + postData.error);
         }
         else
         {
             BusinessStrongHoldInfo data = JsonMapper.ToObject<BusinessStrongHoldInfo>(postData.text);
-            BusinessStrongholdAttribute bss = ConvertTool.ConvertToBussinessStrongholdAttribute(data.BusinessStrongHold);
-            AndaDataManager.Instance.mainData.AddBussinessStronghold(bss);
-            callback(bss);
+            if(data.code == "200")
+            {
+                BusinessStrongholdAttribute bss = ConvertTool.ConvertToBussinessStrongholdAttribute(data.BusinessStrongHold);
+                AndaDataManager.Instance.mainData.AddBussinessStronghold(bss);
+                AndaDataManager.Instance.mainData.ReduceComodityForID("sh_bs_00");
+                callback(bss);
+            }
+            else
+            {
+                AndaUIManager.Instance.PlayTips("检查网络");
+            }
+           
         }
+    }
+
+    #endregion
+
+    #region  修改据点名字
+
+    public void CallServerEditroStrongholdNickName(int shIndex,string nickName,System.Action<int,string> action)
+    {
+        var _wForm = new WWWForm();
+        _wForm.AddField("token", AndaDataManager.Instance.mainData.token);
+        _wForm.AddField("index", shIndex);
+        _wForm.AddField("name", nickName);
+        string path = networkAdress2 + "StrongHold/EditName";
+        StartCoroutine(ExcuteCallServerEditorStrongholdNickName(shIndex,nickName,path, _wForm, action));
+    }
+
+    private IEnumerator ExcuteCallServerEditorStrongholdNickName(int shIndex, string nick ,string path , WWWForm wWWForm,System.Action<int,string> action)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(path, wWWForm);
+        yield return postData;
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if(string.IsNullOrEmpty(postData.error))
+        {
+            Result result = JsonMapper.ToObject<Result>(postData.text);
+            if(result.code == "200")
+            {
+                AndaDataManager.Instance.mainData.UpdateStrongholdNickName(shIndex,nick);
+                if(action!=null)
+                {
+                    action(shIndex,nick);
+                }
+            }else
+            {
+                AndaUIManager.Instance.PlayCheckNetErrorTips();
+            }
+        }else
+        {
+            Debug.LogError("EditorNickNameError:" + postData.error);
+        }
+
+    }
+    #endregion
+
+    #region 修改据描述
+    public void CallServerEditorStrongholdDescription(int shIndex,string _description,System.Action<int ,string> action)
+    {
+        WWWForm wWWForm = new WWWForm();
+        wWWForm.AddField("token" , AndaDataManager.Instance.token);
+        wWWForm.AddField("index" , shIndex);
+        wWWForm.AddField("description",_description);
+        string path = networkAdress2+"StrongHold/EditDescription";
+        StartCoroutine(ExcuteCallServerEditorStrongholdDescription(shIndex,_description,path,wWWForm,action));
+         
+    }
+    private IEnumerator ExcuteCallServerEditorStrongholdDescription(int shIndex,string _description, string path ,WWWForm _wwwForm,System.Action<int,string> action)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(path, _wwwForm);
+        yield return postData;
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (string.IsNullOrEmpty(postData.error))
+        {
+            Result result = JsonMapper.ToObject<Result>(postData.text);
+            if (result.code == "200")
+            {
+                AndaDataManager.Instance.mainData.UpdateStrongholdDescpriton(shIndex, _description);
+                if (action != null)
+                {
+                    action(shIndex, _description);
+                }
+            }
+            else
+            {
+                AndaUIManager.Instance.PlayCheckNetErrorTips();
+            }
+        }
+        else
+        {
+            Debug.LogError("EditorStrongholdError:" + postData.error);
+        }
+
+    }
+
+
+    #endregion
+
+
+    #region 升级据点
+
+    public void CallServerUplevelStronghold(int shIndex,System.Action action)
+    {
+
+    }
+
+
+    private IEnumerator ExcuteUplevelStronghold(string path ,WWWForm _wform,System.Action action)
+    {
+        yield return null;
     }
 
     #endregion
@@ -493,15 +598,16 @@ public class NetworkController : MonoBehaviour {
                 {
                     string key = AndaDataManager.userAdsKey + businessAds.ads.content;
 
-                    Debug.Log("InsertKey:" + key);
-
                     PlayerPrefs.SetString(key, adsStruct.content);
                 }
+
+                AndaDataManager.Instance.mainData.UpdateStrongholdAds(businessAds.ads,bsIndex);
+
                 action(adsStruct);
             }
             else
             {
-                AndaUIManager.Instance.PlayTips("检查网络:500");
+                AndaUIManager.Instance.PlayTips("检查网络");
             }
 
 
@@ -509,7 +615,7 @@ public class NetworkController : MonoBehaviour {
         {
 
 
-            AndaUIManager.Instance.PlayTips("检查网络" + postData.error);
+            AndaUIManager.Instance.PlayTips("上传广告出错：" + postData.error);
         }
 
     }
@@ -545,7 +651,7 @@ public class NetworkController : MonoBehaviour {
             //-- 更新本地数据
             //据点里的奖励数据更新
             AndaDataManager.Instance.mainData.UpdateAddStrongholdReward(bsIndex, rewardIndex);
-            Debug.Log("Here Run Times");
+            //Debug.Log("Here Run Times");
             callback(result.code == "200", rewardIndex);
         }
       
@@ -617,6 +723,51 @@ public class NetworkController : MonoBehaviour {
         }
     }
     #endregion
+
+    #region 商家据点放入boss
+
+    public void CallServerSetMonsterCard(int shIndex, string monsterID, System.Action<int , string> action)
+    {
+        WWWForm wWWForm = new WWWForm();
+        wWWForm.AddField("token" ,AndaDataManager.Instance.token);
+        wWWForm.AddField("bossID", monsterID);
+        wWWForm.AddField("StrongholdIndex" , shIndex);
+        string path = networkAdress2+"StrongHold/ChangeBossID";
+        StartCoroutine(ExcuteCallServerSetMonsterCard(shIndex,monsterID,path,wWWForm,action));
+    }
+
+    private IEnumerator ExcuteCallServerSetMonsterCard(int shIndex,string monsterID,string path, WWWForm _wwwform,System.Action<int, string> action)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(path, _wwwform);
+        yield return postData;
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (postData.error != null)
+        {
+            AndaUIManager.Instance.PlayTips("放置怪兽卡错误" + postData.error);
+        }
+        else
+        {
+            Result result = JsonMapper.ToObject<Result>(postData.text);
+            if(result.code == "200")
+            {
+                AndaDataManager.Instance.mainData.UpdateStrongholdMonsterCard(shIndex, monsterID);
+              
+                if(action!=null)
+                {
+                    action(shIndex,monsterID);
+                }
+            }
+            else
+            {
+                AndaUIManager.Instance.PlayCheckNetErrorTips();
+            }
+           
+        }
+    }
+
+    #endregion
+
     #region 向服务器所以广告的图片
 
     public void CallServerGetUserAdsImg(string _key, System.Action<Sprite> callback)
@@ -863,6 +1014,94 @@ public class NetworkController : MonoBehaviour {
     }
     #endregion
 
+    #region 升级据点
+    public void CallServerUplevelStronghold(int shIndex, System.Action<int> action)
+    {
+        WWWForm wWWForm = new WWWForm();
+        wWWForm.AddField("token" , AndaDataManager.Instance.token);
+        wWWForm.AddField("StrongHoldIndex", shIndex);
+        string path = networkAdress2 + "BusinessMain/UpStronghold";
+        StartCoroutine(ExcuteCallServerUplevelStronghold(shIndex,path,wWWForm,action));
+    }
+
+    private IEnumerator ExcuteCallServerUplevelStronghold(int shIndex,string path,WWWForm _wwwForm,System.Action<int> callback)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(path, _wwwForm);
+        yield return postData;
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (!string.IsNullOrEmpty(postData.error))
+        {
+            Debug.Log(postData.error); 
+            AndaUIManager.Instance.PlayTips("升级据点错误提示：" + postData.error);
+        }
+        else
+        {
+            Result rs = JsonMapper.ToObject<Result>(postData.text);
+            if (rs.code == "200")
+            {
+              
+                if (callback != null)
+                {
+                    callback(shIndex);
+                }
+
+            }
+            else
+            {
+                AndaUIManager.Instance.PlayCheckNetErrorTips();
+            }
+        }
+    }
+
+    #endregion
+
+
+    #region 向服务兑换物品
+
+    public void CallServerBuyCommodity(string commodityID, int count,System.Action<BusinessSD_Pag4U> action)
+    {
+         WWWForm wWWForm = new WWWForm();
+        wWWForm.AddField("token" ,AndaDataManager.Instance.mainData.token);
+        wWWForm.AddField("count", count);
+        wWWForm.AddField("commodityID", commodityID);
+        string path = networkAdress2 + "BusinessMain/ObjectInsret";
+        StartCoroutine(ExcuteCallServerBuyCommodity(path,wWWForm,action));
+
+    }
+
+    private IEnumerator ExcuteCallServerBuyCommodity(string path ,WWWForm _wForm,System.Action<BusinessSD_Pag4U> action)
+    {
+        AndaUIManager.Instance.OpenWaitBoard(true);
+        WWW postData = new WWW(path, _wForm);
+        yield return postData;
+        AndaUIManager.Instance.OpenWaitBoard(false);
+        if (!string.IsNullOrEmpty(postData.error))
+        {
+            Debug.Log(postData.error);
+        }
+        else
+        {
+            MallBusinessSingle mbs = JsonMapper.ToObject<MallBusinessSingle>(postData.text);
+            if(mbs.code == "200")
+            {
+                AndaDataManager.Instance.mainData.AddCommodity(mbs.item);
+                if(action!=null)
+                {
+                    action(mbs.item);
+                }
+              
+            }
+            else
+            {
+                AndaUIManager.Instance.PlayTips("购买失败请检查网络");
+            }
+        }
+    }
+
+
+    #endregion
+
     #region 购买验证
 
     public void VerifyAppleBuy(string appleReceipt)
@@ -895,4 +1134,44 @@ public class NetworkController : MonoBehaviour {
     }
 
     #endregion
+
+
+
+    #region 测试获取物品接口
+
+    public void CallServerGetCommodity()
+    {
+        WWWForm wWWForm = new WWWForm();
+        wWWForm.AddField("method" , "taobao.tbk.item.get ");
+        wWWForm.AddField("app_key" , "25653277");
+      //  wWWForm.AddField("sign_method",)
+    }
+
+
+
+    #endregion
 }
+
+public class TestTBKAPI
+{
+    public NTbkItem[] results{get;set;}
+
+    public int total_results{get;set;}
+}
+
+public class NTbkItem
+{
+    public string num_iid { get; set; }
+    public string title { get; set; }
+    public string pict_url { get; set; }
+    public string[] small_images { get; set; }
+    public string reserve_price { get; set; }
+    public string zk_final_price { get; set; }
+    public int user_type { get; set; }
+    public string provcity { get; set; }
+    public string item_url { get; set; }
+    public string nick { get; set; }
+    public int seller_id { get; set; }
+    public int volume { get; set; }
+}
+

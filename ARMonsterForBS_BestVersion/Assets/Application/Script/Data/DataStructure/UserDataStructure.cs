@@ -100,9 +100,15 @@ public class BussinessRewardStruct
     public int rewardDropCount { get; set; }
     //奖励构成，由哪几个奖励合成
     public List<BussinessRewardStruct> rewardcomposeID { get; set; }
-
+    /// <summary>
+    /// 总计
+    /// </summary>
+    /// <value>The total count.</value>
     public int totalCount { get; set; }
-
+    /// <summary>
+    /// 掉落数量
+    /// </summary>
+    /// <value>The fallen count.</value>
     public int fallenCount { get; set; }
 
     /// <summary>

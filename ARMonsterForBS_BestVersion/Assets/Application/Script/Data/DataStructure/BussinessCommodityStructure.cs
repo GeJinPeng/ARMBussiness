@@ -154,6 +154,7 @@ public class MonsterLevelBox
 {
     public int level {get;set;}
     public string title { get; set; }
+    public int hotValue{get;set;}
     public List<string> data {get;set;}
 }
 

@@ -10,7 +10,10 @@ public class MainData  {
     public List<BusinessStrongholdAttribute> businessStrongholdAttributes;
     public List<LD_Objs> strongholdDrawingList = new List<LD_Objs>();
     public List<LD_Objs> strongholdRewardCardList = new List<LD_Objs>();
-    public List<BussinessRewardStruct> bussinessReward;
+    public List<BussinessRewardStruct> bussinessReward;   
+    public List<BusinessSD_Pag4U> freeMonsterCard ;
+    public List<BusinessSD_Pag4U> monsterCard;
+    public List<BusinessSD_Pag4U> bussinessPag =new List<BusinessSD_Pag4U>();
     public Sprite imgPor;
 
 
@@ -20,6 +23,7 @@ public class MainData  {
         token =_token;
         playerData = _playerData;
         bussinessReward = playerData.businessCoupons;
+        bussinessPag = playerData.businessSD_Pag4Us;
         int count = bussinessReward.Count;
         for(int i = 0; i <count; i ++)
         {
@@ -29,6 +33,8 @@ public class MainData  {
 
         BuildBussinessStrongholdAttrubte();
         BuildStrongholdDawingList();
+        SetMonsterCard();
+       
         GetImg();
     }
 
@@ -36,6 +42,50 @@ public class MainData  {
     {
 
     }
+
+    #region 计算出可以使用的monster Card
+
+    public void SetMonsterCard()
+    {
+        int count = playerData.businessSD_Pag4Us.Count;
+        for(int i = 0 ; i < count; i++ )
+        {
+            if(playerData.businessSD_Pag4Us[i].commodityID.Substring(0,5) == "ms_bs")
+            {
+                if(monsterCard == null) monsterCard = new List<BusinessSD_Pag4U>();
+                monsterCard.Add(playerData.businessSD_Pag4Us[i]);
+                if(freeMonsterCard == null) freeMonsterCard = new List<BusinessSD_Pag4U>();
+                freeMonsterCard.Add(playerData.businessSD_Pag4Us[i]);
+            }
+        }
+        
+    }
+
+
+    #endregion
+
+    #region 计算出可以使用的怪兽卡
+
+    public List<BusinessSD_Pag4U> GetFreeMonster()
+    {
+        if(monsterCard == null || monsterCard.Count == 0) return null;
+        int count = freeMonsterCard.Count;
+        int shCount = businessStrongholdAttributes.Count;
+        for (int i = 0 ;i < count; i++)
+        {
+            for(int j = 0 ; j < shCount; j++)
+            {
+                if(businessStrongholdAttributes[j].monsterCardID == freeMonsterCard[i].commodityID)
+                {
+                    freeMonsterCard[i].objectCount -=1;
+                }
+            }
+        }
+
+        return freeMonsterCard;
+    }
+
+    #endregion
 
     #region 向服务器所要头像数据
 
@@ -108,6 +158,71 @@ public class MainData  {
     }
     #endregion
 
+    #region 添加和减少
+
+    public void AddCommodity(BusinessSD_Pag4U item)
+    {
+        BusinessSD_Pag4U bs = bussinessPag.FirstOrDefault(s=>s.objectIndex == item.objectIndex);
+        if(bs == null)
+        {
+            bussinessPag.Add(item);
+        }else
+        {
+            bs.objectCount += item.objectCount;
+        }
+    }
+
+    public void ReducCommodity(BusinessSD_Pag4U item)
+    {
+        BusinessSD_Pag4U bs = bussinessPag.FirstOrDefault(s => s.objectIndex == item.objectIndex);
+        if (bs == null)
+        {
+            return;
+        }
+        else
+        {
+
+            bs.objectCount -= item.objectCount;
+            if (bs.objectCount<0) bs.objectCount=0;
+        }
+    }
+
+    public void ReduceComodityForID(string id)
+    {
+        bussinessPag.FirstOrDefault(s => s.commodityID == id).objectCount-=1;
+    }
+     
+
+    #endregion
+
+    #region 放置怪兽卡成功  要减去一张 同时更新据点数据
+
+    public void ReduceFreemonsterCard(string monsterID)
+    {
+        if(freeMonsterCard!=null && freeMonsterCard.Count!=0)
+        {
+            freeMonsterCard.FirstOrDefault(s=>s.commodityID == monsterID).objectCount-=1;
+        }
+    }
+
+    public void AddFreemonsterCard(string monsterID)
+    {
+        freeMonsterCard.FirstOrDefault(s=>s.commodityID == monsterID).objectCount +=1;
+    }
+
+    public void UpdateStrongholdMonsterCard(int shIndex, string monsterID)
+    {
+        string lastMonsterCardID = businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex).monsterCardID;
+        if(!string.IsNullOrEmpty(lastMonsterCardID))
+        {
+            AddFreemonsterCard(lastMonsterCardID);
+        }
+        ReduceFreemonsterCard(monsterID);
+        businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex).monsterCardID = monsterID;
+    }
+
+    #endregion
+
     #region 获取据点数据
 
     public BusinessStrongholdAttribute GetAtrongholdAttributes(int _index)
@@ -124,6 +239,14 @@ public class MainData  {
     {
         return strongholdDrawingList;
     }
+
+    public int GetCommodityCountForSH_BS_00()
+    {
+        if(bussinessPag == null || bussinessPag.Count == 0)return 0;
+        BusinessSD_Pag4U pag4U = bussinessPag.FirstOrDefault(s=>s.commodityID == "sh_bs_00");
+        if(pag4U == null || pag4U.objectCount == 0)return 0;
+        else return pag4U.objectCount;
+    }
     #endregion
 
     #region 获取奖励数据
@@ -134,6 +257,29 @@ public class MainData  {
         return bussinessReward.FirstOrDefault(s=>s.businesscouponIndex == _index);
     }
 
+
+
+    #endregion
+
+
+    #region 获取可以使用的奖励券
+
+    public List<BussinessRewardStruct> GetCanusingRewardData()
+    {
+        List<BussinessRewardStruct> list  = null;
+        int count = bussinessReward.Count;
+        for(int i = 0 ; i <count;i ++)
+        {
+            if(bussinessReward[i].status == 0)
+            {
+                if(list == null) list = new List<BussinessRewardStruct>();
+                list.Add(bussinessReward[i]);
+            }
+        }
+
+        return list;//会有空值的情况，请一定要注意判空
+    }
+
     #endregion
 
 
@@ -142,8 +288,16 @@ public class MainData  {
     public void UpdateAddStrongholdReward(int shIndex,int rewardIndex)
     {
         BusinessStrongholdAttribute bs = businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex);
-        Debug.Log("AddBefore" + bs.coupons.Count);
-        bs.coupons.Add(rewardIndex);
+        if(bs.coupons == null) 
+        {
+            bs.coupons = new List<int>();
+            bs.coupons.Add(rewardIndex);
+        }else
+        {
+            bs.coupons[0] = rewardIndex;
+        }
+
+
         Debug.Log("AfterAdd" + bs.coupons.Count);
         //businessStrongholdAttributes.FirstOrDefault(s=>s.strongholdIndex == shIndex).coupons.Add(rewardIndex);
     }
@@ -160,10 +314,21 @@ public class MainData  {
 
     public void UpdateStrongholdNickName(int shIndex , string nickName)
     {
-        businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex).strongholdNickName = nickName;
-        if(UpdateStrongholdDataEvent!=null)
+        BusinessStrongholdAttribute bsa =  businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex);
+        bsa.strongholdNickName = nickName;
+        if (UpdateStrongholdDataEvent!=null)
         {
-            UpdateStrongholdDataEvent(businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex));
+            UpdateStrongholdDataEvent(bsa);
+        }
+    }
+
+    public void UpdateStrongholdDescpriton(int shIndex, string des)
+    {
+        BusinessStrongholdAttribute bsa = businessStrongholdAttributes.FirstOrDefault(s => s.strongholdIndex == shIndex);
+        bsa.description = des;
+        if (UpdateStrongholdDataEvent != null)
+        {
+            UpdateStrongholdDataEvent(bsa);
         }
     }
 
@@ -198,6 +363,32 @@ public class MainData  {
         brs.status = 2;
     }
     #endregion
+
+    #endregion
+
+
+    #region 更新广告
+
+    public void UpdateStrongholdAds(AdsStruct adsStruct ,int shIndex)
+    {
+        BusinessStrongholdAttribute bsa = businessStrongholdAttributes.FirstOrDefault(s=>s.strongholdIndex == shIndex);
+        if(bsa.adsInfos == null || bsa.adsInfos.Count == 0)
+        {
+            bsa.adsInfos = new List<AdsStruct>();
+            bsa.adsInfos.Add(adsStruct);
+        }else
+        {
+            if(bsa.adsInfos.Count -1 < adsStruct.itemIndex)
+            {
+                bsa.adsInfos.Add(adsStruct);
+            }
+            else
+            {
+                bsa.adsInfos[adsStruct.itemIndex] = adsStruct;
+            }
+        }
+    }
+
 
     #endregion
 }

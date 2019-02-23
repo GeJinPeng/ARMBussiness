@@ -128,6 +128,12 @@ public class MallSingle : Result
 {
     public SD_Pag4U item { get; set; }
 }
+
+public class MallBusinessSingle : Result
+{
+    public BusinessSD_Pag4U item { get; set; }
+}
+
 //商店购买回调
 public class MallDetailRes : Result
 {

@@ -73,13 +73,33 @@ public class LoginController : BaseController {
          
         if(isSuccess)
         {
-            PlayerPrefs.SetString("PlayerAccount",loginCtrlData.getLoginView.accountInput.text);
-            mainContoller.SwitchCtrl("mapCtrl"); 
+
+            loginCtrlData.getLoginView.GetComponent<Animator>().Play("FadeOut");
+
+            Invoke("EnterQuickStartView" ,0.8f);
+
+           
+
+           // OpenView(false);
+           //mainContoller.SwitchCtrl("mapCtrl"); 
         }else
         {
 
         }
     }
     #endregion
+
+    private void EnterQuickStartView()
+    {
+        PlayerPrefs.SetString("PlayerAccount", loginCtrlData.getLoginView.accountInput.text);
+
+        GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.QuickStartView);
+
+
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+
+        loginCtrlData.getLoginView.gameObject.SetActive(false);
+    }
+ 
 
 }

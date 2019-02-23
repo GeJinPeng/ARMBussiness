@@ -854,7 +854,47 @@ public static class GetGameConfigData  {
                             "rc_bs_00",
                             "rc_bs_01"
                         }
-                    }
+                    },
+                    new CommodityTypeStructure
+                    {
+                        typte = "ms",
+                        cnName = "怪兽卡",
+                        idList = new   List<string>
+                        {
+                            "ms_bs_1004",
+                           "ms_bs_1005",
+                            "ms_bs_1006",
+                            "ms_bs_1007",
+                            "ms_bs_1010",
+                            "ms_bs_1011",
+                            "ms_bs_2001",
+                        }
+                    },
+                    new CommodityTypeStructure
+                    {
+                        typte = "sh",
+                        cnName = "建造图纸",
+                        idList = new   List<string>
+                        {
+                            "sh_bs_00",
+                            "sh_bs_01",
+                            "sh_bs_02",
+                            "sh_bs_03",
+                            "sh_bs_04"
+                        }
+                    },
+                    new CommodityTypeStructure
+                    {
+                        typte = "dz",
+                        cnName = "定制",
+                        idList = new   List<string>
+                        {
+                            "dz_bs_prop00",
+                            "dz_bs_prop01",
+                            "dz_bs_prop02",
+                            "dz_bs_monster00",
+                        }
+                    },
                 };
               
             }
@@ -879,6 +919,7 @@ public static class GetGameConfigData  {
                     {
                         level = 0,
                         title = "初级星宿卡",
+                        hotValue = 30,
                         data = new List<string>
                         {
                             "ms_bs_1004","ms_bs_1005","ms_bs_1007",
@@ -889,6 +930,7 @@ public static class GetGameConfigData  {
                     {
                         level =1,
                         title = "高级星宿卡",
+                        hotValue =50,
                         data = new List<string>
                         {
                             "ms_bs_1006","ms_bs_1011",
@@ -1081,6 +1123,19 @@ public static class GetGameConfigData  {
         return monsterLevelBox.FirstOrDefault(s=>s.level == level);
     }
 
+    public static MonsterLevelBox GetMonsterLevelBoxByMonsterID(string monsterID)
+    {
+        int count = monsterLevelBox.Count;
+        for(int i = 0 ;i < count;i++)
+        {
+            if(monsterLevelBox[i].data.Contains(monsterID))
+            {
+                return monsterLevelBox[i];
+            }
+        }
+
+        return null;//一般不是在这里，如果有，一定是配置文件问题。或者传入的ID 有误
+    }
     /// <summary>
     /// 通过id 查找物件配置表中的物件
     /// </summary>

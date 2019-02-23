@@ -6,6 +6,47 @@ using LitJson;
 using System.Linq;
 public class AndaDataManager  {
 
+
+    /* 例子 */
+    /// <summary>
+    /// 实力化你想要的物件
+    /// </summary>
+    public void InstantiateYouWanttoNewItem()
+    {
+        //在 下面 添加你想要的物件 名字 为const 。例如：AdsEditorView = 
+        //public const string AdsEditorView = "AdsEditorView";
+
+        //调用接口
+        //这个接口包含实力话
+        GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.AdsEditorView);
+        //把界面放在canvas 。一级界面都是放在canvas里，如果像小item可以自己放置想要在无位置
+
+        //例如 一级界面：=》注意这个是通过 AndaUIManager调用
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+
+
+        //如果是 小item    注意这个是通过 AAndaDataManager调用
+     
+        //AndaDataManager.Instance.SetInto(view.transform ,tt);
+
+
+        //获取界面脚本 =》 
+
+        //TestTBKAPI test =  view.GetComponent<TestTBKAPI>();
+
+        //传值 =====>
+
+
+
+        //销毁直接调用 Desctory（）；//这里需要注意如果有产生附属品 需要清空的清空
+    }
+
+
+
+
+
+
+
     private static AndaDataManager _andaDataManager = null;
 
     public static AndaDataManager Instance
@@ -21,6 +62,8 @@ public class AndaDataManager  {
      
         }
     }
+
+    public string token {get { return mainData.token ;}}
     public MainContoller mainContoller;
     public NetworkController networkController;
      
@@ -32,9 +75,19 @@ public class AndaDataManager  {
     public const string ChooseTipsView = "ChooseTipsView";
     public const string BussinessCouponItem = "BussinessCouponItem";
     public const string BusinessCouponManagerView = "BusinessCouponManagerView";
-
-
+    public const string ItemInfo_SmallAdsInfomation = "ItemInfo_SmallAdsInfomation";
+    public const string ItemInfo_StrongholdInformation= "ItemInfo_StrongholdInformation";
+    public const string AdsEditorView = "AdsEditorView";
     public const string userAdsKey = "UserAdsTexture_";
+    public const string ScannerViwer = "ScannerViwer";
+    public const string QuickStartView = "QuickStartView";
+    public const string ItemEditor_SHBaseInfo = "ItemEditor_SHBaseInfo";
+    public const string ItemInfo_MonsterCard = "ItemInfo_MonsterCard";
+    public const string ItemInfo_SmallMonsterCard = "ItemInfo_SmallMonsterCard";
+    public const string ItemInfo_SmallBusinessCoupon = "ItemInfo_SmallBusinessCoupon";
+    public const string SelectMonsterCardToSH = "SelectMonsterCardToSH";
+    public const string SelectBsCouponToSH = "SelectBsCouponToSH";
+
     #region 设置和更新数据
     public void SetUserData(BusinessData playerData , string token)
     {
@@ -60,6 +113,10 @@ public class AndaDataManager  {
     public Sprite GetBussinessStrongholdLevelSprite(int level)
     {
         return Resources.Load<Sprite>("Sprite/LevelBoard/BussinessSH/" + level);
+    }
+    public Sprite GetBussinessStronghol(int level)
+    {
+        return Resources.Load<Sprite>("Sprite/Stronghold/SH256_0/" + level);
     }
 
     public Sprite GetIconSprite(int id)
@@ -212,13 +269,19 @@ public class AndaDataManager  {
 
     #region 获取用户头像
 
+
+
     public void GetUserImg(string path, System.Action<Sprite> action)
     {
         string s = PlayerPrefs.GetString("SH_" + path);
        
         if (s == "")
         {
-            CallServerGetUserImg(path, action);
+            CallServerGetUserImg(path, (result=>
+            {
+                if (mainData.userImage == null) mainData.userImage = result;
+                action(result);
+            }));
             Debug.Log("从网络读取");
         }
         else

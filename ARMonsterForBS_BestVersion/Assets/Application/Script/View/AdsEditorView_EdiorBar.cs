@@ -12,7 +12,8 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
     public Image textureInput;
 
     public GameObject comfirmBtn;
-     
+    public Text tipsContent;
+    public GameObject tipsItem;
     public System.Action<AdsStruct>callbcak_saveFinsh;
   // public System.Action<Sprite,AdsStruct> callbcak_saveFinshForSprite;
     private AdsStruct adsStruct;
@@ -26,8 +27,10 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
     private string currentType;
     private Sprite resultSprite;
     private Texture2D result;
-    public void OpenEditorBar(AdsStruct _adsStruct , BussinessSHRootConfig _bsrc)
+    private int bsaIndex;
+    public void OpenEditorBar(int _bsaIndex, AdsStruct _adsStruct , BussinessSHRootConfig _bsrc)
     {
+        bsaIndex = _bsaIndex;
         adsStruct = _adsStruct;
         bsrc = _bsrc;
         barAnimator.Play("FadeIn");
@@ -253,15 +256,15 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
 
     public void ChangeContent()
     {
-        switch(adsStruct.type)
+        switch(currentToggleIndex)
         {
-            case "text":
+            case 0:
                 comfirmBtn.gameObject.SetActive(lastContent!= textInput.text);
                 break;
-            case "texture":
+            case 1:
                 comfirmBtn.gameObject.SetActive(true);
                 break;
-            case "video":
+            case 2:
                 comfirmBtn.gameObject.SetActive(lastContent != videoInput.text);
                 break;
         }
@@ -269,7 +272,7 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
 
     private void Upload()
     {
-        AndaDataManager.Instance.networkController.CallServerUploadAds(58284, new AdsStruct
+        AndaDataManager.Instance.networkController.CallServerUploadAds(bsaIndex, new AdsStruct
         {
             itemIndex = adsStruct.itemIndex,
             type = GetGameConfigData.GetAdsLevelBoxItem(currentToggleIndex).key,
@@ -322,5 +325,38 @@ public class AdsEditorView_EdiorBar : MonoBehaviour {
     {
         toggleGroup.SetAllTogglesOff();
         barAnimator.Play("FadeOut");
+    }
+
+
+    public void OpenTips(string tips)
+    {
+        tipsItem.gameObject.SetActive(true);
+        tipsContent.text = tips;
+    }
+
+    public void CloseTips()
+    {
+        tipsItem.gameObject.SetActive(false);
+    }
+
+    private Vector3 startMousePose;
+    public void FixedUpdate()
+    {
+        if (gameObject.activeSelf)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                startMousePose = Input.mousePosition;
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                //float delta = Mathf.Abs(i)
+                if (Input.mousePosition.x - startMousePose.x > 500)
+                {
+                    CallBackUploadFinish(null);
+                }
+            }
+        }
     }
 }

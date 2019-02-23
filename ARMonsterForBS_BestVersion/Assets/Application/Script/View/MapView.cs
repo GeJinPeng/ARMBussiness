@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class MapView : ViewBasic {
 
     public Transform  infoBoard;
-
+    public Transform box;
     public ItemInfo_SpriteAndName strongholdIconItem;
     public Transform strongholdGrid;
     public Transform consumableGrid;
@@ -29,7 +29,7 @@ public class MapView : ViewBasic {
 
     public GiftEditionBar giftEditionBar;
 
-    public ForwardGeocodeUserInput forwardGeocodeUser;
+    public ForwardGeocodeUserInput w;
 
     public InputField searchInput;
 
@@ -110,15 +110,25 @@ public class MapView : ViewBasic {
     {
         newItem.GetComponent<Animator>().Play("down");
         newItem.GetComponent<ItemInfo_MapNewShItem>().CloseChooseBtn();
-        Invoke("InvokExcuteSetStronghold", 0.51f);
+
+        ((MapController)baseController).CallServerInsertStronghold(AndaDataManager.Instance.mainData.playerData.userName, "tt");
+
+        //Invoke("InvokExcuteSetStronghold", 0.51f);
     }
     private void InvokExcuteSetStronghold()
     {
-        strongholdInfoBar.StartView();
+        /*strongholdInfoBar.StartView();
+         GameObject view= AndaDataManager.Instance.InstantiateItem(AndaDataManager.ItemInfo_StrongholdInformation);
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+        view.GetComponent<ItemInfo_StrongholdInformation>().SetInfo(new BusinessStrongholdAttribute
+        {
+
+        });
+
         //利用建造图纸的等级，提供等级框
         Sprite lvBoard =AndaDataManager.Instance.GetBussinessStrongholdLevelSprite(useStrongholdDrwaing.objSmallID);
         strongholdInfoBar.SetLevelBoard(lvBoard);
-        AndaUIManager.Instance.PlayTips("请编辑信息");
+        AndaUIManager.Instance.PlayTips("请编辑信息");*/
     }
 
     #endregion
@@ -135,7 +145,7 @@ public class MapView : ViewBasic {
 
     #region 玩家编辑完据点信心，上传
 
-    private void PlayerFinishEditorInformation(string shName, byte[] infos)
+    private void PlayerFinishEditorInformation(string shName)
     {
         AndaUIManager.Instance.PlayTips("正在上传");
         ((MapController)baseController).CallServerInsertStronghold(shName,"tt");
@@ -145,7 +155,7 @@ public class MapView : ViewBasic {
 
 
     #region 构建新的据点
-    public void BuildNewSHItem(LD_Objs lD_Objs)
+    public void BuildNewSHItem(LD_Objs lD_Objs = null)
     {
 
         if(newItem!=null)Destroy(newItem);
@@ -156,10 +166,13 @@ public class MapView : ViewBasic {
         newItem.transform.localScale = Vector3.one;
         newItem.transform.localPosition = Vector3.zero;
         //-通过图纸来判断该据点的等级
-        Sprite lvBoard = AndaDataManager.Instance.GetBussinessStrongholdLevelSprite(lD_Objs.objSmallID);
-        Sprite icon = AndaDataManager.Instance.GetIconSprite(100);
-        newItem.GetComponent<ItemInfo_MapNewShItem>().SetInfo(lvBoard,icon,"", ComfimSetStrongholdHere, CancelAddNewItem);
-        newItem.GetComponent<Animator>().Play("up");
+        //Sprite lvBoard = AndaDataManager.Instance.GetBussinessStronghol(0);
+        AndaDataManager.Instance.GetUserImg(AndaDataManager.Instance.mainData.playerData.headImg,(result=>
+        {
+            newItem.GetComponent<ItemInfo_MapNewShItem>().SetInfo(null, result, "", ComfimSetStrongholdHere, CancelAddNewItem);
+            newItem.GetComponent<Animator>().Play("up");
+        }));
+
     }
 
     #endregion
@@ -171,7 +184,7 @@ public class MapView : ViewBasic {
         {
             GameObject _item = Instantiate(strongholdIconItem.gameObject);
             ItemInfo_SpriteAndName itemInfo_Sprite = _item.GetComponent<ItemInfo_SpriteAndName>();
-            Sprite sprite = Resources.Load<Sprite>("Sprite/Stronghold/stronghold0" + infos[i].strongholdLevel);
+            Sprite sprite = Resources.Load<Sprite>("Sprite/Stronghold/SH256_0" + infos[i].strongholdLevel);
             itemInfo_Sprite.SetInfo(infos[i].strongholdIndex,sprite , infos[i].strongholdNickName);
             itemInfo_Sprite.callback = callback;
             _item.transform.SetParent(strongholdGrid.transform);
@@ -318,5 +331,10 @@ public class MapView : ViewBasic {
     public void OpenRewardList()
     {
 
+    }
+
+    public void TmpTaobao()
+    {
+        AndaDataManager.Instance.mainContoller.Taobao();
     }
 }

@@ -7,17 +7,27 @@ public class LoginView : ViewBasic {
     public override void StartView()
     {
         base.StartView();
-        if(PlayerPrefs.GetString("PlayerAccount")!="")
+
+
+        AndaUIManager.Instance.uIController.OpenBackground(true);
+
+        if (PlayerPrefs.GetString("PlayerAccount")!="")
         {
             accountInput.text = PlayerPrefs.GetString("PlayerAccount");
         }
         gameObject.SetActive(true);
-        FadeIn();
+       //FadeIn();
+
+        if (!string.IsNullOrEmpty(accountInput.text))
+        {
+            ClickLogin();
+        }
     }
 
     public override void EndView()
     {
-        FadeOut();
+      // FadeOut();
+        AndaUIManager.Instance.uIController.OpenBackground(false);
         base.EndView();
     }
 

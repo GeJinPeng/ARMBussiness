@@ -110,6 +110,7 @@ public class StrongholdGrowUpAttribute
     public string autograph { get; set; }
     public List<int> activitys { get; set; }
 
+    public string description{get;set;}
 
     /// <summary>
     /// 商家用的boss ID 
@@ -137,6 +138,7 @@ public class PlayerStrongHoldGrowUpAttribute: StrongholdGrowUpAttribute
 
 public class BusinessStrongholdGrowUpAttribute : StrongholdGrowUpAttribute
 { 
+
     public BusinessData BusinessData{get;set;}
     public List<BusinessActivity> businessActivity { get; set; }
     public List<BussinessRewardStruct> businessCoupons { get; set; }
@@ -203,11 +205,15 @@ public class StrongholdBaseAttribution
     //雕像ID
     public int statueID {get;set;}
 
+    public string description{get;set;}
+
     /// <summary>
     /// 据点下的优惠券s
     /// </summary>
     /// <value>The coupons.</value>
     public List<int> coupons { get; set; }
+
+    public string monsterCardID { get; set; }
 }
 /// <summary>
 /// 玩家据点相关数据
@@ -237,7 +243,9 @@ public class PlayerStrongholdAttribute : StrongholdBaseAttribution
     //建立时间
     public int strongholdCreatTime{get;set;}
     
-     public int currentExp { get; set; }
+    public int currentExp { get; set; }
+
+   
 
 }
 public class BusinessStrongholdAttribute : StrongholdBaseAttribution
@@ -246,5 +254,10 @@ public class BusinessStrongholdAttribute : StrongholdBaseAttribution
     /// 广告组
     /// </summary>
     /// <value>The ads infos.</value>
-    public List<AdsStruct> adsInfos { get;set;} 
+    public List<AdsStruct> adsInfos { get;set;}
+
+
+
+
+
 }

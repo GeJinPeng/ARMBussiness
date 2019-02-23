@@ -94,9 +94,9 @@ public class MapCtrlData  {
             }
         }
 
-        Debug.Log("MineCount" + mineStrongholdList.Count);
+        //Debug.Log("MineCount" + mineStrongholdList.Count);
 
-        Debug.Log("OtherCount" + otherStrongholdList.Count);
+       //Debug.Log("OtherCount" + otherStrongholdList.Count);
        
 
         count = pInfos.Count;
@@ -108,7 +108,7 @@ public class MapCtrlData  {
             pInfos[i].strongholdInMapPosition = mapController.map.GeoToWorldPosition(v);
             playerStrongholdList.Add(pInfos[i]);
         }
-        Debug.Log("PlayerCount" + playerStrongholdList.Count);
+       // Debug.Log("PlayerCount" + playerStrongholdList.Count);
     }
 
     #region 构建据点物件
@@ -127,21 +127,20 @@ public class MapCtrlData  {
         }
         int count = mineStrongholdList.Count;
 
-        Debug.Log("MineBussCount" + count);
+        //Debug.Log("MineBussCount" + count);
         for (int i = 0 ; i < count;i++)
         {
             GameObject item = Resources.Load<GameObject>("Prefab/mapItem_BussinessStrongholdItem"); //Resources.Load<GameObject>("Prefab/"+ (30000+ mineStrongholdList[i].strongholdLevel));
             item = GameObject.Instantiate(item);
-            item.transform.SetParent(mapView.transform);
+            item.transform.SetParent(mapView.box.transform);
             item.transform.localScale = Vector3.one;
             BusinessStrongholdAttribute bs = mineStrongholdList[i];
-            Sprite levelBoard = AndaDataManager.Instance.GetBussinessStrongholdLevelSprite(bs.strongholdLevel);
+            Sprite levelBoard = AndaDataManager.Instance.GetBussinessStronghol(bs.strongholdLevel);
             item.GetComponent<ItemInfo_Img_level_name>().SetInfo(bs.strongholdIndex,AndaDataManager.Instance.mainData.imgPor,levelBoard, bs.strongholdNickName);
             item.GetComponent<ItemInfo_Img_level_name>().callback = OpenStrongholdAddtionBar;
             mineStrongholdItem.Add(item);
             item.name = bs.strongholdNickName;
         }
-
 
         //其他商家据点
         if(otherStrongholdItem.Count!=0)
@@ -155,12 +154,12 @@ public class MapCtrlData  {
         }
 
         count = otherStrongholdList.Count;
-        Debug.Log("OtherBussCount" + count);
+        //Debug.Log("OtherBussCount" + count);
         for (int i = 0; i < count; i++)
         {
             GameObject item = Resources.Load<GameObject>("Prefab/mapItem_BussinessStrongholdItem");
             item = GameObject.Instantiate(item);
-            item.transform.SetParent(mapView.transform);
+            item.transform.SetParent(mapView.box.transform);
             item.transform.localScale = Vector3.one;
 
             /*BusinessStrongholdAttribute bs = mineStrongholdList[i];
@@ -183,12 +182,12 @@ public class MapCtrlData  {
         }
 
         count = playerStrongholdList.Count;
-        Debug.Log("PlayerCount" + count);
+       // Debug.Log("PlayerCount" + count);
         for (int i = 0 ; i < count; i++)
         {
             GameObject item = Resources.Load<GameObject>("Prefab/mapItem_PlayerStrongholdItem");// + (30000 + playerStrongholdList[i].strongholdLevel));
             item = GameObject.Instantiate(item);
-            item.transform.parent = mapView.transform;
+            item.transform.parent = mapView.box.transform;
             item.transform.localScale = Vector3.one;
             playerStrongholdItem.Add(item);
         }
@@ -199,14 +198,22 @@ public class MapCtrlData  {
     #region 打开据点添加奖励面板
     public void OpenStrongholdAddtionBar(int _index)
     {
-        if (AndaDataManager.Instance.mainData.bussinessReward.Count <= 0)
-        {
-            AndaUIManager.Instance.PlayTips("请先去编辑奖励");
-            return;
-        }
+        /* if (AndaDataManager.Instance.mainData.bussinessReward.Count <= 0)
+         {
+             AndaUIManager.Instance.PlayTips("请先去编辑奖励");
+             return;
+         }
+         BusinessStrongholdAttribute businessStrongholdAttribute = AndaDataManager.Instance.mainData.GetAtrongholdAttributes(_index);
+         mapController.strongholdAddRewardBar.gameObject.SetActive(true);
+         mapController.strongholdAddRewardBar.SetStrongholdInfo(businessStrongholdAttribute);
+ */
+
         BusinessStrongholdAttribute businessStrongholdAttribute = AndaDataManager.Instance.mainData.GetAtrongholdAttributes(_index);
-        mapController.strongholdAddRewardBar.gameObject.SetActive(true);
-        mapController.strongholdAddRewardBar.SetStrongholdInfo(businessStrongholdAttribute);
+        GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.ItemInfo_StrongholdInformation);
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+        ItemInfo_StrongholdInformation info_StrongholdInformation = view.GetComponent<ItemInfo_StrongholdInformation>();
+        info_StrongholdInformation.SetInfo(businessStrongholdAttribute);
+
     }
     #endregion
     public void AdditionBuildMineStrongholdItem()

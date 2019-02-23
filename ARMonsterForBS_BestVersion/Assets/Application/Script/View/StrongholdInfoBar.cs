@@ -16,7 +16,7 @@ public class StrongholdInfoBar : ViewBasic {
     private byte[] imageByte;
 
     private System.Action callbackClickCancel;
-    private System.Action<string , byte[] > callbackClickSave;
+    private System.Action<string> callbackClickSave;
 
     public GameObject addtionItem;
     private List<GameObject> rewardslist = new List<GameObject>();
@@ -50,7 +50,7 @@ public class StrongholdInfoBar : ViewBasic {
         FadeIn();
     }
 
-    public void RegisterCallback(System.Action<string,byte[]> _callbackClickComfirm,System.Action _callbackClickCancel)
+    public void RegisterCallback(System.Action<string> _callbackClickComfirm,System.Action _callbackClickCancel)
     {
         callbackClickSave = _callbackClickComfirm;
         callbackClickCancel = _callbackClickCancel;
@@ -156,7 +156,7 @@ public class StrongholdInfoBar : ViewBasic {
         FadeOut();
         if (callbackClickSave!=null)
         {
-            callbackClickSave(inputField.text,imageByte);
+            callbackClickSave(inputField.text);
         }
 
         //ClearReardList();

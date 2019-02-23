@@ -91,8 +91,18 @@ public class ItemInfo_MallCommodity : MonoBehaviour {
     {
        // AndaDataManager.Instance.networkController.VerifyAppleBuy("json");
 
-        AndaDataManager.Instance.mainContoller.Purchase("commodityID" + mallCommodityStructure.commodityIndex);
+        //AndaDataManager.Instance.mainContoller.Purchase("commodityID" + mallCommodityStructure.commodityIndex);
+   
+        AndaDataManager.Instance.networkController.CallServerBuyCommodity(mallCommodityStructure.commodityID,100, CallBackFinishBuy);
+
     }
+
+    private void CallBackFinishBuy(BusinessSD_Pag4U businessSD_Pag4U)
+    {
+        AndaUIManager.Instance.PlayTipsForBuySuccess();
+    }
+
+
 
 }
 

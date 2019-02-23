@@ -160,15 +160,25 @@ public class MapController : BaseController {
     #region 选择据点图纸
     public void ClickSelectStrongholdDrawing(int strongholdDrawingIndex)
     {
+        //mapCtrlData.BuildNewMineStronghold(null);
+        //return;
+        if (AndaDataManager.Instance.mainData.GetCommodityCountForSH_BS_00() >= 1)
+        {
+            mapCtrlData.BuildNewMineStronghold(null);
+        }
+        else
+        {
+            AndaUIManager.Instance.PlayTips("该图纸数量不够");
+        }
        //先判断一下图纸够不够
-        LD_Objs lD_Objs = AndaDataManager.Instance.mainData.strongholdDrawingList.FirstOrDefault(s => s.objIndex == strongholdDrawingIndex);
+       /*LD_Objs lD_Objs = AndaDataManager.Instance.mainData.strongholdDrawingList.FirstOrDefault(s => s.objIndex == strongholdDrawingIndex);
         if (lD_Objs.lessCount>=1)
         {
             mapCtrlData.BuildNewMineStronghold(lD_Objs);
         }else
         {
             AndaUIManager.Instance.PlayTips("该图纸数量不够");
-        }
+        }*/
     }
     #endregion
 
@@ -211,7 +221,7 @@ public class MapController : BaseController {
         Vector3 pose = AndaDataManager.Instance.RayCastHit(mapCamera);
         if(pose.Equals(Vector3.zero))return;
         Vector2d v2d = map.WorldToGeoPosition(pose);
-        Debug.Log("v2d" + v2d);
+       
         AndaDataManager.Instance.CallServerInsertStronghold(nickName,localName,v2d.x,v2d.y, CallBackFinishSetStronghold);
     }
 
@@ -224,7 +234,10 @@ public class MapController : BaseController {
         mapCtrlData.getMapView.CancelAddNewItem();//把临时的那个物件 消掉
         UpdateUIPose();
         canMove =true;
-        //mapCtrlData.getMapView.strongholdInfoBar.SetSaveBtnDisable();//让保存按钮失效
+
+        GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.ItemInfo_StrongholdInformation);
+        AndaUIManager.Instance.SetIntoCanvas(view.transform);
+        view.GetComponent<ItemInfo_StrongholdInformation>().SetInfo(businessStrongholdAttribute);
     }
 
    
@@ -281,17 +294,19 @@ public class MapController : BaseController {
 
     private void MoveCamera()
     {
+       
+
         if(Input.GetMouseButtonDown(0))
         {
-            if (!EventSystem.current.IsPointerOverGameObject())
-            {
-                isUpdateMousePose = true;
-                startMousePose = Input.mousePosition;
-            }
+            if (EventSystem.current.IsPointerOverGameObject()) return ;
+             
+            isUpdateMousePose = true;
+            startMousePose = Input.mousePosition;
         }
 
         if(Input.GetMouseButton(0))
         {
+            //if(!canMove)return;
             if(isUpdateMousePose)
             {
                 Vector3 delta = Input.mousePosition - startMousePose;//new Vector3(Screen.width/2 , Screen.height/2,0);
@@ -308,6 +323,7 @@ public class MapController : BaseController {
 
         if(Input.GetMouseButtonUp(0))
         {
+           
             isUpdateMousePose = false;
         }
     }
@@ -317,14 +333,14 @@ public class MapController : BaseController {
         //if(!canMove)return ;
         int count1 = mapCtrlData.getPlayerStrongholdAttrs.Count;
 
-        Debug.Log("PlayerItemCount" + count1);
+     //   Debug.Log("PlayerItemCount" + count1);
 
         int count2 = mapCtrlData.getMineStrongholdAttrs.Count;
 
-        Debug.Log("MineItemCount" + count2);
+     //   Debug.Log("MineItemCount" + count2);
         int count3 = mapCtrlData.getOtherStrongholdAttrs.Count;
 
-        Debug.Log("OtherItemCount" + count3);
+     //  Debug.Log("OtherItemCount" + count3);
 
         for (int i = 0 ; i <count2 ; i++)
         {

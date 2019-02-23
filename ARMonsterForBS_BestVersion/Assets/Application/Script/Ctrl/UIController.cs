@@ -12,6 +12,10 @@ public class UIController : MonoBehaviour {
 
     public LeftPanelView leftPanelView;
 
+    public ScanningTool scanningTool;
+
+    public GameObject background;
+
     private void Awake()
     {
         AndaUIManager.Instance.uIController = this;
@@ -38,5 +42,25 @@ public class UIController : MonoBehaviour {
     {
         leftPanelView.Show();
     }
+
+    public void OpenScannerView()
+    {
+        if(scanningTool==null)
+        {
+
+            GameObject view = AndaDataManager.Instance.InstantiateItem(AndaDataManager.ScannerViwer);
+            AndaUIManager.Instance.SetIntoCanvas(view.transform);
+            scanningTool= view.GetComponent<ScanningTool>();
+
+        }
+       
+
+    }
+
+    public void OpenBackground(bool isOpen)
+    {
+        background.gameObject.SetActive(isOpen);
+    }
+
 
 }

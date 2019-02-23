@@ -81,10 +81,24 @@ public class MainContoller : MonoBehaviour {
     {
         _Purchase(id);
     }
-     
+    [DllImport("__Internal")]
+    public static extern void _Taobao();
+    public void Taobao()
+    {
+        _Taobao();
+    }
+
+
+
+
+
+
+
     public void IOSCallBack_Purchase(string json)
     {
         //回调，让服务器去验证一下，然后发放物品
         AndaDataManager.Instance.networkController.VerifyAppleBuy(json);
     }
+
+
 }
